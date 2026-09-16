@@ -24,24 +24,28 @@ Prefer concise commit subjects that include the Linear identifier when practical
 
 `feat(CS-7): add application shell`
 
-## 4. Pull requests
+## 4. Pull requests and review
 
 The PR title should include the Linear identifier. In the PR body, link the Linear issue and explain how the acceptance criteria were validated.
 
-At least one teammate should review implementation PRs before merge unless the team explicitly agrees that a trivial change is exempt.
+PRs are reviewed **manually before merge**. The Product Owner/team lead is the default reviewer, or another teammate can review when appropriate. Trivial changes may be exempt when the team explicitly agrees.
+
+Resolve any review comments that block merge before merging.
 
 ## 5. Merge strategy
 
 Default to **squash merge**. This keeps `main` readable and normally produces one merge commit per Linear issue.
 
-Delete the feature branch after merge.
+Delete the feature branch after merge when practical.
 
 ## 6. Linear status convention
 
-Until native GitHub status automation is configured in the Linear workspace:
+Linear remains the task system of record. The GitHub integration provides branch/PR/merge evidence and cross-links work back to the corresponding Linear issue.
+
+Use these statuses operationally:
 
 - Branch created / active implementation → `In Progress`
 - PR opened → `In Review` once that status exists
 - PR merged and acceptance criteria satisfied → `Done`
 
-Linear remains the task system of record. GitHub branches, commits, reviews, merges, and CI are evidence of implementation, not a second task tracker.
+If native status automation is unavailable or not configured for a transition, update the Linear status manually rather than maintaining a second workflow in GitHub.
