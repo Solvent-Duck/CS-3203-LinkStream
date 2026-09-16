@@ -26,7 +26,7 @@ LinkStream is a student software engineering project inspired by [GoLinks](https
 
 ## Product overview
 
-Teams use many tools, while the links to those tools often live in disconnected documents, chat histories, and bookmarks. LinkStream aims to give a resource one short, recognizable name that everyone on the team can remember and share. The project follows the internal-shortcut concept described in [GoLinks' Y Combinator profile](https://www.ycombinator.com/companies/golinks), with an initial focus on developer teams.
+Teams use many tools, while the links to those tools often live in disconnected documents, chat histories, and bookmarks. LinkStream aims to give a resource one short, recognizable name that everyone on the team can remember and share. 
 
 **Who it serves:** Software engineers and DevOps engineers, engineering managers and technical leads, and new teammates learning where project resources live.
 
