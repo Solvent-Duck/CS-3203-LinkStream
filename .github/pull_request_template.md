@@ -15,7 +15,7 @@ What changed and why?
 
 ## Review
 
-- [ ] At least one teammate reviewed this PR before merge, unless the team explicitly agrees the change is exempt.
+- [ ] The PR was manually reviewed by the Product Owner/team lead or another appropriate teammate, unless explicitly exempted as trivial.
 - [ ] Review comments that block merge are resolved.
 
 ## Merge
