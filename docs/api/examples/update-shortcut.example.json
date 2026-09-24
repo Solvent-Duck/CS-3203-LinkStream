@@ -1,0 +1,8 @@
+{
+  "targetUrl": "https://api.example.internal/v2/swagger-ui",
+  "tags": [
+    "backend",
+    "api",
+    "v2"
+  ]
+}

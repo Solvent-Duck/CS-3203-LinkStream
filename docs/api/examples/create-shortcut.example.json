@@ -1,0 +1,10 @@
+{
+  "alias": "go/api-docs",
+  "targetUrl": "https://api.example.internal/swagger-ui",
+  "title": "API Documentation",
+  "description": "Canonical Swagger UI for the LinkStream API.",
+  "tags": [
+    "backend",
+    "api"
+  ]
+}

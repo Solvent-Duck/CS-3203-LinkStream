@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://linkstream.local/schemas/linkstream-api.schema.json",
+  "title": "LinkStream API Payload Schemas",
+  "description": "Transport-neutral JSON schemas for Sprint 1 LinkStream shortcut payloads. Endpoint paths/methods are intentionally owned by CS-22.",
+  "$defs": {
+    "Alias": {
+      "type": "string",
+      "description": "Canonical human-readable shortcut alias including the go/ prefix.",
+      "pattern": "^go/[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 4,
+      "maxLength": 80,
+      "examples": [
+        "go/sprint",
+        "go/api-docs"
+      ]
+    },
+    "Tag": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 40,
+      "examples": [
+        "agile",
+        "backend"
+      ]
+    },
+    "Health": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Asynchronous link-health result. Null means the destination has not been checked yet.",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "statusCode",
+        "checkedAt"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "healthy",
+            "unhealthy"
+          ]
+        },
+        "statusCode": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "checkedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      }
+    },
+    "Shortcut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "alias",
+        "targetUrl",
+        "title",
+        "description",
+        "tags",
+        "ownerId",
+        "teamId",
+        "clickCount",
+        "health",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Stable server-generated shortcut identifier."
+        },
+        "alias": {
+          "$ref": "#/$defs/Alias"
+        },
+        "targetUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Tag"
+          }
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Opaque identifier from the authentication/user model."
+        },
+        "teamId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "Opaque team/namespace identifier used to scope alias uniqueness."
+        },
+        "clickCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Read-only usage count maintained by the service."
+        },
+        "health": {
+          "$ref": "#/$defs/Health"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "CreateShortcutRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alias",
+        "targetUrl",
+        "title"
+      ],
+      "properties": {
+        "alias": {
+          "$ref": "#/$defs/Alias"
+        },
+        "targetUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500,
+          "default": null
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Tag"
+          },
+          "default": []
+        }
+      }
+    },
+    "UpdateShortcutRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "alias": {
+          "$ref": "#/$defs/Alias"
+        },
+        "targetUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/Tag"
+          }
+        }
+      }
+    },
+    "ShortcutResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/Shortcut"
+        }
+      }
+    },
+    "Pagination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "limit",
+        "offset",
+        "total"
+      ],
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "ShortcutListResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data",
+        "page"
+      ],
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Shortcut"
+          }
+        },
+        "page": {
+          "$ref": "#/$defs/Pagination"
+        }
+      }
+    },
+    "ShortcutSearchResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query",
+        "data",
+        "page"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Shortcut"
+          }
+        },
+        "page": {
+          "$ref": "#/$defs/Pagination"
+        }
+      }
+    }
+  }
+}
