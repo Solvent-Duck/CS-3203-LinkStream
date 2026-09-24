@@ -80,6 +80,10 @@ npm run dev
 
 The frontend runs locally on port `3000` by default.
 
+## API documentation
+
+Sprint 1 API payloads and JSON schemas are documented in [`docs/api/payloads-and-json-schemas.md`](docs/api/payloads-and-json-schemas.md). The schema bundle is transport-neutral so route definitions and HTTP error semantics can evolve independently.
+
 ## Validation
 
 Available project checks include:
