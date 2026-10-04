@@ -55,4 +55,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/access_tokens_controller').default['destroy']>>>
     }
   }
+  'links.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/links'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/links_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/links_controller').default['index']>>>
+    }
+  }
+  'links.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/links'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/links_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/links_controller').default['store']>>>
+    }
+  }
+  'links.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/links/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/links_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/links_controller').default['show']>>>
+    }
+  }
+  'links.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/links/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/links_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/links_controller').default['destroy']>>>
+    }
+  }
+  'redirects.resolve_scoped': {
+    methods: ["GET","HEAD"]
+    pattern: '/go/:teamSlug/:linkSlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { teamSlug: ParamValue; linkSlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redirects_controller').default['resolveScoped']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redirects_controller').default['resolveScoped']>>>
+    }
+  }
+  'redirects.resolve_global': {
+    methods: ["GET","HEAD"]
+    pattern: '/go/:linkSlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { linkSlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/redirects_controller').default['resolveGlobal']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/redirects_controller').default['resolveGlobal']>>>
+    }
+  }
 }

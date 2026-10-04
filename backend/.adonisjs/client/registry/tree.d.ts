@@ -18,4 +18,14 @@ export interface ApiDefinition {
       destroy: typeof routes['profile.access_tokens.destroy']
     }
   }
+  links: {
+    index: typeof routes['links.index']
+    store: typeof routes['links.store']
+    show: typeof routes['links.show']
+    destroy: typeof routes['links.destroy']
+  }
+  redirects: {
+    resolveScoped: typeof routes['redirects.resolve_scoped']
+    resolveGlobal: typeof routes['redirects.resolve_global']
+  }
 }
