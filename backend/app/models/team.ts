@@ -1,5 +1,8 @@
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import TeamMember from '#models/team_member'
+import Link from '#models/link'
 
 export default class Team extends BaseModel {
   @column({ isPrimary: true })
@@ -19,4 +22,13 @@ export default class Team extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  @hasMany(() => TeamMember)
+  declare members: HasMany<typeof TeamMember>
+
+  @hasMany(() => TeamMember)
+  declare teamMembers: HasMany<typeof TeamMember>
+
+  @hasMany(() => Link)
+  declare links: HasMany<typeof Link>
 }
