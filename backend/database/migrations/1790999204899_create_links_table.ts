@@ -12,11 +12,11 @@ export default class extends BaseSchema {
       table.text('description').nullable()
 
       table
-        .integer('namespace_id')
+        .integer('team_id')
         .unsigned()
         .nullable()
         .references('id')
-        .inTable('namespaces')
+        .inTable('teams')
         .onDelete('SET NULL')
       table
         .integer('user_id')
@@ -37,7 +37,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').nullable()
       table.timestamp('deleted_at').nullable()
 
-      table.unique(['namespace_id', 'slug'])
+      table.unique(['team_id', 'slug'])
       table.index(['slug'], 'links_slug_index')
     })
   }
