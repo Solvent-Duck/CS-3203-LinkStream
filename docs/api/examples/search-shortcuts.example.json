@@ -1,0 +1,31 @@
+{
+  "query": "api",
+  "data": [
+    {
+      "id": "a9a24c9d-1cc6-48c5-b820-f43b179e2e29",
+      "alias": "go/api-docs",
+      "targetUrl": "https://api.example.internal/swagger-ui",
+      "title": "API Documentation",
+      "description": "Canonical Swagger UI for the LinkStream API.",
+      "tags": [
+        "backend",
+        "api"
+      ],
+      "ownerId": "user_isaiah",
+      "teamId": "team_a",
+      "clickCount": 890,
+      "health": {
+        "state": "healthy",
+        "statusCode": 200,
+        "checkedAt": "2026-09-23T23:30:00Z"
+      },
+      "createdAt": "2026-09-15T15:00:00Z",
+      "updatedAt": "2026-09-23T23:30:00Z"
+    }
+  ],
+  "page": {
+    "limit": 25,
+    "offset": 0,
+    "total": 1
+  }
+}
