@@ -8,18 +8,7 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -53,22 +42,7 @@ export class LinkTagSchema extends BaseModel {
 }
 
 export class LinkSchema extends BaseModel {
-  static $columns = [
-    'clickCount',
-    'createdAt',
-    'deletedAt',
-    'description',
-    'destinationUrl',
-    'healthStatus',
-    'id',
-    'isActive',
-    'lastHealthCheckAt',
-    'slug',
-    'teamId',
-    'title',
-    'updatedAt',
-    'userId',
-  ] as const
+  static $columns = ['clickCount', 'createdAt', 'deletedAt', 'description', 'destinationUrl', 'healthStatus', 'id', 'isActive', 'lastHealthCheckAt', 'slug', 'teamId', 'title', 'updatedAt', 'userId'] as const
   $columns = LinkSchema.$columns
   @column()
   declare clickCount: bigint | number
