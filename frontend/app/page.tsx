@@ -38,7 +38,7 @@ export default function Home() {
               <em>one link away.</em>
             </h1>
             <p className="hero-copy">
-              Stop digging through tabs, chats, and bookmarks. Give every
+              Stop dDIGGIND through tabs, chats, and bookmarks. Give every
               important resource a memorable short link your whole team can find,
               use, and share.
             </p>

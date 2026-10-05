@@ -15,7 +15,7 @@ button { cursor: pointer }
 a { text-decoration: none; color: inherit }
 h1, h2, h3, p { margin-top: 0 }
 h1, h2, h3 { font-family: var(--font-manrope), var(--font-dm-sans), sans-serif; letter-spacing: -.055em }
-em { font-style: normal; color: #36aa91 }
+em { font-style: normal; color: #2dba9c }
 
 .container { width: min(1180px, calc(100% - 56px)); margin-inline: auto }
 
