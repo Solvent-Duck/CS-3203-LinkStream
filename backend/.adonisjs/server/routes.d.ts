@@ -9,8 +9,8 @@ export type ScannedRoutes = {
     'profile.profile.show': { paramsTuple?: []; params?: {} }
     'profile.access_tokens.destroy': { paramsTuple?: []; params?: {} }
     'links.index': { paramsTuple?: []; params?: {} }
-    'links.store': { paramsTuple?: []; params?: {} }
     'links.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'links.store': { paramsTuple?: []; params?: {} }
     'links.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'redirects.resolve_scoped': { paramsTuple: [ParamValue,ParamValue]; params: {'teamSlug': ParamValue,'linkSlug': ParamValue} }
     'redirects.resolve_global': { paramsTuple: [ParamValue]; params: {'linkSlug': ParamValue} }

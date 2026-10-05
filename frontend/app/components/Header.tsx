@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useAuth } from "@/app/lib/auth-context";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, loading } = useAuth();
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   return (
     <header className="site-header">
       <div className="container nav-wrap">
-        <a className="brand" href="#top" aria-label="LinkStream home">
+        <a className="brand" href="/" aria-label="LinkStream home">
           <span className="brand-mark" aria-hidden="true">
             <span></span>
             <span></span>
@@ -51,9 +53,22 @@ export default function Header() {
               Try it out
             </a>
           </div>
-          <a className="nav-cta" href="#playground" onClick={closeMenu}>
-            Get started <span aria-hidden="true">&#x2197;</span>
-          </a>
+          {!loading && (
+            user ? (
+              <a className="nav-cta" href="/dashboard" onClick={closeMenu}>
+                Dashboard <span aria-hidden="true">&#x2197;</span>
+              </a>
+            ) : (
+              <div className="nav-auth">
+                <a className="nav-login" href="/login" onClick={closeMenu}>
+                  Sign in
+                </a>
+                <a className="nav-cta" href="/signup" onClick={closeMenu}>
+                  Get started <span aria-hidden="true">&#x2197;</span>
+                </a>
+              </div>
+            )
+          )}
         </nav>
       </div>
     </header>

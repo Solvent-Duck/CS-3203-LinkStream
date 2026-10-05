@@ -20,8 +20,8 @@ export interface ApiDefinition {
   }
   links: {
     index: typeof routes['links.index']
-    store: typeof routes['links.store']
     show: typeof routes['links.show']
+    store: typeof routes['links.store']
     destroy: typeof routes['links.destroy']
   }
   redirects: {

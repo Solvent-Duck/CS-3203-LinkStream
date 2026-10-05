@@ -39,9 +39,14 @@ router
       .use(middleware.auth())
 
     router.get('/links', [LinksController, 'index']) // Full-text list & typeahead search
-    router.post('/links', [LinksController, 'store']) // Create new shortcut
     router.get('/links/:id', [LinksController, 'show']) // Fetch single link metadata
-    router.delete('/links/:id', [LinksController, 'destroy']) // Soft/hard delete
+
+    router
+      .group(() => {
+        router.post('/links', [LinksController, 'store']) // Create new shortcut
+        router.delete('/links/:id', [LinksController, 'destroy']) // Soft/hard delete
+      })
+      .use(middleware.auth())
   })
   .prefix('/api/v1')
 

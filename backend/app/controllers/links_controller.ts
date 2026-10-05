@@ -43,7 +43,7 @@ export default class LinksController {
    * POST /api/v1/links
    * Validates and registers a new shortcut
    */
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, auth }: HttpContext) {
     const validator = vine.compile(
       vine.object({
         slug: vine
@@ -54,12 +54,12 @@ export default class LinksController {
         title: vine.string().trim().maxLength(255),
         description: vine.string().trim().optional(),
         teamId: vine.number().optional(),
-        userId: vine.number(),
         tags: vine.array(vine.string()).optional(),
       })
     )
 
     const payload = await request.validateUsing(validator)
+    const user = auth.getUserOrFail()
 
     // Check collision in target scope
     const existing = await Link.query()
@@ -86,7 +86,7 @@ export default class LinksController {
       title: payload.title,
       description: payload.description || null,
       teamId: payload.teamId || null,
-      userId: payload.userId,
+      userId: user.id,
       isActive: true,
       healthStatus: 'healthy',
       clickCount: 0,

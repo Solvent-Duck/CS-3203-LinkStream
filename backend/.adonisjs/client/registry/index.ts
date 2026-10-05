@@ -36,17 +36,17 @@ const routes = {
     tokens: [{"old":"/api/v1/links","type":0,"val":"api","end":""},{"old":"/api/v1/links","type":0,"val":"v1","end":""},{"old":"/api/v1/links","type":0,"val":"links","end":""}],
     types: placeholder as Registry['links.index']['types'],
   },
-  'links.store': {
-    methods: ["POST"],
-    pattern: '/api/v1/links',
-    tokens: [{"old":"/api/v1/links","type":0,"val":"api","end":""},{"old":"/api/v1/links","type":0,"val":"v1","end":""},{"old":"/api/v1/links","type":0,"val":"links","end":""}],
-    types: placeholder as Registry['links.store']['types'],
-  },
   'links.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/links/:id',
     tokens: [{"old":"/api/v1/links/:id","type":0,"val":"api","end":""},{"old":"/api/v1/links/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/links/:id","type":0,"val":"links","end":""},{"old":"/api/v1/links/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['links.show']['types'],
+  },
+  'links.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/links',
+    tokens: [{"old":"/api/v1/links","type":0,"val":"api","end":""},{"old":"/api/v1/links","type":0,"val":"v1","end":""},{"old":"/api/v1/links","type":0,"val":"links","end":""}],
+    types: placeholder as Registry['links.store']['types'],
   },
   'links.destroy': {
     methods: ["DELETE"],
