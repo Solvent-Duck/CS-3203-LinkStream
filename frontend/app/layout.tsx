@@ -9,13 +9,17 @@ interface LayoutProps {
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
+  display: "swap",
   weight: ["400", "500", "600", "700"],
+  fallback: ["system-ui", "sans-serif"],
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
+  display: "swap",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  fallback: ["system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
