@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { DM_Sans, Manrope } from "next/font/google";
 import "./globals.css";
+interface LayoutProps {
+  children: React.ReactNode;
+  params?: Promise<{ [key: string]: string }>;
+}
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -20,7 +24,7 @@ export const metadata: Metadata = {
     "LinkStream turns scattered work links into a simple, searchable home for your team.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en" className={`${dmSans.variable} ${manrope.variable}`}>
       <body>{children}</body>
