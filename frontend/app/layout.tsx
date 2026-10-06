@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { DM_Sans, Manrope } from "next/font/google";
 import "./globals.css";
 interface LayoutProps {
