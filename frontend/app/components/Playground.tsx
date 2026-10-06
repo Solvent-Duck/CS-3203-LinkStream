@@ -80,7 +80,7 @@ export default function Playground() {
               required
               onInput={clearValidity}
             />
-            <label htmlFor="keyword">Your shortcut TEST</label>
+            <label htmlFor="keyword">Your shortcut TEST part 2</label>
             <div className="shortcut-field">
               <span>go/</span>
               <input
