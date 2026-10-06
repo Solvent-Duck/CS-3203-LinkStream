@@ -42,7 +42,7 @@ export class LinkTagSchema extends BaseModel {
 }
 
 export class LinkSchema extends BaseModel {
-  static $columns = ['clickCount', 'createdAt', 'deletedAt', 'description', 'destinationUrl', 'healthStatus', 'id', 'isActive', 'lastHealthCheckAt', 'slug', 'teamId', 'title', 'updatedAt', 'userId'] as const
+  static $columns = ['clickCount', 'createdAt', 'deletedAt', 'description', 'destinationUrl', 'healthStatus', 'id', 'isActive', 'lastHealthCheckAt', 'namespaceId', 'slug', 'title', 'updatedAt', 'userId'] as const
   $columns = LinkSchema.$columns
   @column()
   declare clickCount: bigint | number
@@ -63,9 +63,9 @@ export class LinkSchema extends BaseModel {
   @column.dateTime()
   declare lastHealthCheckAt: DateTime | null
   @column()
-  declare slug: string
+  declare namespaceId: number | null
   @column()
-  declare teamId: number | null
+  declare slug: string
   @column()
   declare title: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })

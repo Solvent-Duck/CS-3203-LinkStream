@@ -47,7 +47,7 @@ export default function Playground() {
         <div className="playground-copy">
           <div className="section-kicker">GIVE IT A GO</div>
           <h2>
-            Your next shortcut
+            Your next shortcut TEST
             <br />
             starts <em>right here.</em>
           </h2>
@@ -80,7 +80,7 @@ export default function Playground() {
               required
               onInput={clearValidity}
             />
-            <label htmlFor="keyword">Your shortcut</label>
+            <label htmlFor="keyword">Your shortcut TEST</label>
             <div className="shortcut-field">
               <span>go/</span>
               <input
