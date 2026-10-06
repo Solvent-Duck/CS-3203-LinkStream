@@ -9,6 +9,7 @@ import {
   createLink,
   deleteLink,
   ApiError,
+  API_BASE,
 } from "@/app/lib/api";
 
 export default function DashboardPage() {
@@ -18,6 +19,8 @@ export default function DashboardPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [showBrowserTip, setShowBrowserTip] = useState(false);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   // Create form state
@@ -56,6 +59,40 @@ export default function DashboardPage() {
     }, 300);
     return () => clearTimeout(timeout);
   }, [search, user, fetchLinks]);
+
+  // Automatically refresh click counts when returning to the dashboard tab
+  useEffect(() => {
+    function onFocus() {
+      if (user) fetchLinks(search || undefined);
+    }
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [user, search, fetchLinks]);
+
+  function getRedirectUrl(link: Link) {
+    if (link.team?.slug) {
+      return `${API_BASE}/go/${link.team.slug}/${link.slug}`;
+    }
+    return `${API_BASE}/go/${link.slug}`;
+  }
+
+  async function handleCopy(link: Link) {
+    try {
+      await navigator.clipboard.writeText(`go/${link.slug}`);
+      setCopiedId(link.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // Fallback if clipboard API restricted
+      const textArea = document.createElement("textarea");
+      textArea.value = `go/${link.slug}`;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopiedId(link.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -155,6 +192,72 @@ export default function DashboardPage() {
           >
             {showCreate ? "Cancel" : "&#xFF0B; New link"}
           </button>
+        </div>
+
+        <div className="browser-tip-card">
+          <div
+            className="browser-tip-header"
+            onClick={() => setShowBrowserTip(!showBrowserTip)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setShowBrowserTip(!showBrowserTip);
+              }
+            }}
+          >
+            <div className="browser-tip-title">
+              <span className="browser-tip-badge">Pro-tip</span>
+              <span>
+                Enable <code>go/&lt;keyword&gt;</code> in your browser omnibox
+              </span>
+            </div>
+            <button
+              type="button"
+              className="browser-tip-toggle"
+              aria-expanded={showBrowserTip}
+            >
+              {showBrowserTip ? "Hide guide ▲" : "Browser setup guide ▼"}
+            </button>
+          </div>
+          {showBrowserTip && (
+            <div className="browser-tip-content">
+              <p>
+                Type shortcuts like <code>go/roadmap</code> straight into your
+                browser search bar:
+              </p>
+              <ol>
+                <li>
+                  Open Chrome, Edge, or Brave{" "}
+                  <strong>
+                    Settings &rarr; Search engine &rarr; Manage search engines
+                    and site search
+                  </strong>
+                  .
+                </li>
+                <li>
+                  Under <strong>Site search</strong>, click{" "}
+                  <strong>Add</strong>:
+                  <ul>
+                    <li>
+                      <strong>Name:</strong> LinkStream
+                    </li>
+                    <li>
+                      <strong>Shortcut:</strong> <code>go</code>
+                    </li>
+                    <li>
+                      <strong>URL:</strong> <code>{API_BASE}/go/%s</code>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  Type <code>go roadmap</code> in your address bar and hit
+                  Enter!
+                </li>
+              </ol>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -270,39 +373,91 @@ export default function DashboardPage() {
           </p>
         ) : (
           <div className="links-list">
-            {links.map((link) => (
-              <div key={link.id} className="link-card">
-                <div className="link-card-main">
-                  <div className="link-card-icon">&#x25C8;</div>
-                  <div className="link-card-info">
-                    <strong>{link.title}</strong>
-                    <span className="link-card-slug">go/{link.slug}</span>
-                    <span className="link-card-url">{link.destinationUrl}</span>
-                  </div>
-                  <div className="link-card-meta">
-                    <span className="link-card-clicks">
-                      {link.clickCount} clicks
-                    </span>
-                    {link.tags.length > 0 && (
-                      <div className="link-card-tags">
-                        {link.tags.map((tag) => (
-                          <span key={tag.id} className="link-tag">
-                            {tag.name}
-                          </span>
-                        ))}
+            {links.map((link) => {
+              const redirectUrl = getRedirectUrl(link);
+              const isCopied = copiedId === link.id;
+
+              return (
+                <div key={link.id} className="link-card">
+                  <div className="link-card-main">
+                    <div className="link-card-icon">&#x25C8;</div>
+                    <div className="link-card-info">
+                      <div className="link-card-title-row">
+                        <a
+                          href={redirectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link-title-link"
+                          title="Open via LinkStream redirect"
+                        >
+                          <strong>{link.title}</strong>
+                        </a>
                       </div>
-                    )}
+
+                      <div className="link-card-slug-row">
+                        <span className="link-card-slug">go/{link.slug}</span>
+                        <button
+                          type="button"
+                          className={`link-copy-btn ${isCopied ? "copied" : ""}`}
+                          onClick={() => handleCopy(link)}
+                          title="Copy go/ shortcut to clipboard"
+                        >
+                          {isCopied ? "✓ Copied!" : "⧉ Copy go/"}
+                        </button>
+                        <a
+                          href={redirectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="link-visit-btn"
+                          title="Open shortcut destination via LinkStream redirect"
+                        >
+                          Visit ↗
+                        </a>
+                      </div>
+
+                      <a
+                        href={link.destinationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-card-url"
+                        title={link.destinationUrl}
+                      >
+                        {link.destinationUrl}
+                      </a>
+
+                      {link.description && (
+                        <p className="link-card-desc">{link.description}</p>
+                      )}
+                    </div>
+                    <div className="link-card-meta">
+                      <span
+                        className="link-card-clicks"
+                        title="Total clicks recorded"
+                      >
+                        {link.clickCount}{" "}
+                        {link.clickCount === 1 ? "click" : "clicks"}
+                      </span>
+                      {link.tags.length > 0 && (
+                        <div className="link-card-tags">
+                          {link.tags.map((tag) => (
+                            <span key={tag.id} className="link-tag">
+                              {tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      className="link-delete"
+                      onClick={() => handleDelete(link.id)}
+                      title="Delete link"
+                    >
+                      &times;
+                    </button>
                   </div>
-                  <button
-                    className="link-delete"
-                    onClick={() => handleDelete(link.id)}
-                    title="Delete link"
-                  >
-                    &times;
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>

@@ -440,15 +440,41 @@ em { font-style: normal; color: #36aa91 }
 .link-card-main { display: flex; align-items: center; gap: 16px }
 .link-card-icon { width: 40px; height: 40px; background: #f0faf6; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #36aa91; font-size: 18px; flex: none }
 .link-card-info { flex: 1; min-width: 0 }
-.link-card-info strong { display: block; font-size: 14px; font-weight: 700; color: #17342f; margin-bottom: 2px }
-.link-card-slug { display: block; font-size: 13px; font-weight: 600; color: #36aa91; margin-bottom: 2px }
-.link-card-url { display: block; font-size: 12px; color: #9cb8ae; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.link-card-title-row { margin-bottom: 3px }
+.link-title-link { text-decoration: none; color: inherit; display: inline-block }
+.link-title-link strong { display: block; font-size: 14px; font-weight: 700; color: #17342f; transition: color .15s }
+.link-title-link:hover strong { color: #2da88f }
+.link-card-slug-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap }
+.link-card-slug { display: inline-block; font-size: 13px; font-weight: 600; color: #1f7a67; background: #edf8f4; padding: 2px 8px; border-radius: 6px }
+.link-copy-btn { background: #ffffff; border: 1px solid #d2ede4; border-radius: 6px; color: #1f7a67; font-size: 11px; font-weight: 700; padding: 3px 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all .15s ease }
+.link-copy-btn:hover { background: #f0faf6; border-color: #2da88f; color: #176051 }
+.link-copy-btn.copied { background: #2da88f; color: #ffffff; border-color: #2da88f }
+.link-visit-btn { background: #ffffff; border: 1px solid #d9e7e2; border-radius: 6px; color: #36aa91; font-size: 11px; font-weight: 700; padding: 3px 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; transition: all .15s ease }
+.link-visit-btn:hover { background: #f0faf6; border-color: #36aa91; color: #1f7a67 }
+.link-card-url { display: block; font-size: 12px; color: #769b8f; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90% }
+.link-card-url:hover { text-decoration: underline; color: #2da88f }
+.link-card-desc { font-size: 12px; color: #6b8f84; margin-top: 4px; margin-bottom: 0; line-height: 1.4 }
 .link-card-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none }
 .link-card-clicks { font-size: 12px; font-weight: 600; color: #6b8f84 }
 .link-card-tags { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end }
 .link-tag { background: #f0faf6; color: #2da88f; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px }
-.link-delete { background: none; border: 1px solid transparent; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; color: #ccc; display: flex; align-items: center; justify-content: center; transition: all .15s; flex: none }
+.link-delete { background: none; border: 1px solid transparent; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; color: #ccc; display: flex; align-items: center; justify-content: center; transition: all .15s; flex: none; cursor: pointer }
 .link-delete:hover { border-color: #fecaca; color: #b91c1c; background: #fef2f2 }
+
+/* Browser integration tip card */
+.browser-tip-card { background: #f7fbf9; border: 1px solid #d9ede5; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px }
+.browser-tip-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 12px }
+.browser-tip-title { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #17342f; flex-wrap: wrap }
+.browser-tip-title code { background: #e0f3eb; padding: 2px 6px; border-radius: 4px; color: #176051; font-size: 12px }
+.browser-tip-badge { background: #2da88f; color: #ffffff; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.5px }
+.browser-tip-toggle { background: none; border: none; color: #2da88f; font-size: 12px; font-weight: 700; cursor: pointer; flex: none }
+.browser-tip-toggle:hover { color: #1f7a67 }
+.browser-tip-content { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #d5ece4; font-size: 12px; color: #3b5b52; line-height: 1.6 }
+.browser-tip-content p { margin: 0 0 8px 0 }
+.browser-tip-content ol { margin: 0; padding-left: 20px }
+.browser-tip-content li { margin-bottom: 4px }
+.browser-tip-content ul { margin: 4px 0 6px 0; padding-left: 20px }
+.browser-tip-content code { background: #e0f3eb; padding: 2px 6px; border-radius: 4px; color: #176051; font-weight: 600 }
 
 @media (max-width: 700px) {
   .auth-card { padding: 32px 24px }
