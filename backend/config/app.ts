@@ -9,6 +9,16 @@ import { defineConfig } from '@adonisjs/core/http'
  */
 export const appUrl = env.get('APP_URL')
 
+const listenHost = env.get('HOST')
+if (
+  app.inProduction &&
+  (listenHost === 'localhost' || listenHost === '127.0.0.1' || listenHost === '::1')
+) {
+  throw new Error(
+    `HOST=${listenHost} only accepts local connections. On Railway set HOST=0.0.0.0 so the platform proxy can reach the process.`
+  )
+}
+
 /**
  * The configuration settings used by the HTTP server
  */
@@ -18,6 +28,13 @@ export const http = defineConfig({
    * Useful to correlate logs and debug a request flow.
    */
   generateRequestId: true,
+
+  /**
+   * Railway terminates TLS and connects from its private network, not from
+   * loopback. Trust forwarded headers in production so request.protocol()
+   * follows X-Forwarded-Proto. Development keeps the loopback default.
+   */
+  trustProxy: app.inProduction ? true : 'loopback',
 
   /**
    * Allow HTTP method spoofing via the "_method" form/query parameter.
