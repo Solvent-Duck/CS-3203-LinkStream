@@ -38,18 +38,7 @@ jobs:
       - name: Type-check frontend
         run: npx next typegen && npm run typecheck
       - name: Build frontend
-        # Google Fonts sometimes returns extensionless /l/font?kit= URLs.
-        # Turbopack then fails with "queries have exactly one entry" and
-        # caches that CSS, so a retry has to delete .next (vercel/next.js#99114).
-        run: |
-          for attempt in 1 2 3 4; do
-            if npm run build; then
-              exit 0
-            fi
-            echo "next build failed on attempt ${attempt}. Clearing .next and retrying."
-            rm -rf .next
-          done
-          exit 1
+        run: npm run build
 
   deploy-production:
     name: Deploy to Vercel Production
@@ -80,17 +69,7 @@ jobs:
       - name: Pull Vercel production settings
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - name: Build production deployment
-        # Same Google Fonts flake as the check job. vercel build runs next
-        # build in frontend/, so the cached CSS lives in frontend/.next.
-        run: |
-          for attempt in 1 2 3; do
-            if vercel build --prod --token="$VERCEL_TOKEN"; then
-              exit 0
-            fi
-            echo "vercel build failed on attempt ${attempt}. Clearing frontend/.next and retrying."
-            rm -rf frontend/.next
-          done
-          exit 1
+        run: vercel build --prod --token="$VERCEL_TOKEN"
       - name: Deploy to Vercel Production
         id: deploy
         run: |

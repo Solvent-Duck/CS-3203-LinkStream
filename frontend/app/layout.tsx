@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { DM_Sans, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import { AuthProvider } from "./lib/auth-context";
 import "./globals.css";
 interface LayoutProps {
@@ -8,20 +8,31 @@ interface LayoutProps {
   params?: Promise<{ [key: string]: string }>;
 }
 
-const dmSans = DM_Sans({
+const dmSans = localFont({
+  src: [
+    { path: "./fonts/dm-sans-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/dm-sans-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/dm-sans-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/dm-sans-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-dm-sans",
-  subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700"],
   fallback: ["system-ui", "sans-serif"],
+  adjustFontFallback: "Arial",
 });
 
-const manrope = Manrope({
+const manrope = localFont({
+  src: [
+    { path: "./fonts/manrope-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/manrope-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/manrope-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/manrope-latin-700-normal.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/manrope-latin-800-normal.woff2", weight: "800", style: "normal" },
+  ],
   variable: "--font-manrope",
   display: "swap",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
   fallback: ["system-ui", "sans-serif"],
+  adjustFontFallback: "Arial",
 });
 
 export const metadata: Metadata = {
