@@ -1,0 +1,4 @@
+# Start the compiled AdonisJS server. `node ace build` writes this file.
+# Run database migrations before start (see railway.toml preDeployCommand):
+#   node ace migration:run --force
+web: node build/bin/server.js

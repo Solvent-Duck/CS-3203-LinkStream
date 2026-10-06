@@ -1,3 +1,5 @@
+// NEXT_PUBLIC_API_URL is inlined at build time. Set it on Vercel to the Railway
+// public URL, then redeploy. Local dev uses localhost when the variable is unset.
 export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333";
 
 interface RequestOptions extends Omit<RequestInit, "body"> {

@@ -1,0 +1,15 @@
+# Railway service root directory must be `backend`.
+# Start and migrate commands match `npm start` and the README.
+# Config-as-code is deprecated for new Railway services (hard cutoff
+# 2026-12-01). If a new service ignores this file, set the same commands
+# in the service settings.
+
+[deploy]
+# Adonis 7 compiles to build/. From the backend directory the server entry
+# is build/bin/server.js. Inside build/ the same file is bin/server.js.
+startCommand = "node build/bin/server.js"
+# Production form of: node ace migration:run --force
+# `--force` is required when NODE_ENV=production.
+preDeployCommand = ["cd build && node ace migration:run --force"]
+healthcheckPath = "/"
+healthcheckTimeout = 300
