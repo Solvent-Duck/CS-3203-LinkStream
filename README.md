@@ -138,3 +138,9 @@ Course assignments and submission requirements remain in OU Canvas.
 ## License
 
 No repository-wide `LICENSE` file is currently included. Confirm the team's intended licensing before reusing or distributing the project.
+
+## Frontend CI/CD
+
+`.github/workflows/frontend-ci.yml` runs unit tests, frontend lint, TypeScript type-check, and the production build on relevant pushes and pull requests. On a push to `main`, the production deployment job waits for all CI checks to pass, then deploys that commit to Vercel. Pull requests run CI without deploying.
+
+Before deployment, create a Vercel project with its **Root Directory** set to `frontend`. From `frontend`, run `vercel link` to obtain the account and project IDs. Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as repository secrets under **GitHub → Settings → Secrets and variables → Actions**. Keep the token private and do not commit the generated `.vercel` folder. Use this GitHub Actions workflow as the production deployment path; avoid an automatic Vercel Git integration that could deploy without the CI checks. The backend is not included because it currently uses local SQLite and lacks production database configuration.

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPreviewLink } from '../preview.js';
+import { createPreviewLink } from '../frontend/app/lib/preview.ts';
 
 test('creates a memorable preview shortcut from a valid destination', () => {
   assert.equal(createPreviewLink('https://example.com/very/long/path', '  Team-Roadmap  '), 'go/team-roadmap');
