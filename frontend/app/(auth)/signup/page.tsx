@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/lib/auth-context";
 import { ApiError } from "@/app/lib/api";
@@ -43,7 +44,7 @@ export default function SignupPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <span className="brand-mark" aria-hidden="true">
             <span></span>
             <span></span>
@@ -52,7 +53,7 @@ export default function SignupPage() {
             link<span className="brand-accent">stream</span>
             <sup>&reg;</sup>
           </span>
-        </a>
+        </Link>
         <h1>Create your account</h1>
         <p className="auth-subtitle">
           Start organizing your team&apos;s links

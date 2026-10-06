@@ -4,7 +4,7 @@ import { DM_Sans, Manrope } from "next/font/google";
 import { AuthProvider } from "./lib/auth-context";
 import "./globals.css";
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params?: Promise<{ [key: string]: string }>;
 }
 

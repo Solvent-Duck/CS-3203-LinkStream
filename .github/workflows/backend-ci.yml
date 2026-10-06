@@ -1,0 +1,52 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  backend:
+    name: Backend lint, type-check, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      TZ: UTC
+      NODE_ENV: test
+      PORT: 3333
+      HOST: 127.0.0.1
+      LOG_LEVEL: info
+      APP_URL: http://127.0.0.1:3333
+      SESSION_DRIVER: memory
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend dependencies
+        run: npm ci
+      - name: Generate throwaway APP_KEY
+        run: echo "APP_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")" >> "$GITHUB_ENV"
+      - name: Lint backend
+        run: npm run lint
+      - name: Type-check backend
+        run: npm run typecheck
+      - name: Run migrations against a fresh SQLite DB
+        run: node ace migration:run --force
+      - name: Run tests
+        run: npm test
+      - name: Build backend
+        run: npm run build

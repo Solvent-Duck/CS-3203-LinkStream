@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { useAuth } from "@/app/lib/auth-context";
 
 export default function Header() {
@@ -12,7 +13,7 @@ export default function Header() {
   return (
     <header className="site-header">
       <div className="container nav-wrap">
-        <a className="brand" href="/" aria-label="LinkStream home">
+        <Link className="brand" href="/" aria-label="LinkStream home">
           <span className="brand-mark" aria-hidden="true">
             <span></span>
             <span></span>
@@ -21,7 +22,7 @@ export default function Header() {
             link<span className="brand-accent">stream</span>
             <sup>&reg;</sup>
           </span>
-        </a>
+        </Link>
         <button
           className="menu-toggle"
           type="button"

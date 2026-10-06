@@ -1,37 +1,29 @@
-# GitHub Actions workflow automatically checks on pushes and pull requests (PR) that change files under frontend
 name: Frontend CI/CD
 
 on:
   push:
-    paths:
-      - "frontend/**"
-      - "tests/**"
-      - "preview.js"
-      - "package.json"
-      - ".github/workflows/frontend-ci.yml"
+    branches: [main]
   pull_request:
-    paths:
-      - "frontend/**"
-      - "tests/**"
-      - "preview.js"
-      - "package.json"
-      - ".github/workflows/frontend-ci.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: frontend-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
     name: Test, lint, type-check, and build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -42,36 +34,55 @@ jobs:
         run: npm test
         working-directory: .
       - name: Lint frontend
-        run: npm run lint
+        run: npm run lint -- --max-warnings=0
       - name: Type-check frontend
-        run: npm run typecheck
+        run: npx next typegen && npm run typecheck
       - name: Build frontend
         run: npm run build
 
   deploy-production:
     name: Deploy to Vercel Production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: check
+    needs: [check]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: vercel-production
+      cancel-in-progress: false
     environment:
       name: production
+      url: ${{ steps.deploy.outputs.url }}
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    # Run Vercel from the repo root: the Vercel project's Root Directory is already "frontend".
     steps:
-      - name: Check out the commit that passed CI
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: npm install --global vercel@62.4.0
       - name: Pull Vercel production settings
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - name: Build production deployment
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
       - name: Deploy to Vercel Production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        id: deploy
+        run: |
+          output=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" 2>&1)
+          printf '%s\n' "$output"
+          clean=$(printf '%s\n' "$output" | sed -r 's/\x1B\[[0-9;]*[mK]//g')
+          url=$(printf '%s\n' "$clean" | sed -n 's/.*Aliased[[:space:]]*\(https:\/\/[^[:space:]]*\).*/\1/p' | tail -n 1)
+          if [ -z "$url" ]; then
+            url=$(printf '%s\n' "$clean" | grep -Eo 'https://[^[:space:]]+' | tail -n 1)
+          fi
+          if [ -z "$url" ]; then
+            echo "vercel deploy did not print a production URL" >&2
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"

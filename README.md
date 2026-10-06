@@ -1,5 +1,8 @@
 # LinkStream
 
+[![Frontend CI/CD](https://github.com/Solvent-Duck/CS-3203-LinkStream/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/Solvent-Duck/CS-3203-LinkStream/actions/workflows/frontend-ci.yml)
+[![Backend CI](https://github.com/Solvent-Duck/CS-3203-LinkStream/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/Solvent-Duck/CS-3203-LinkStream/actions/workflows/backend-ci.yml)
+
 **Memorable internal short links for teams**
 
 CS 3203 — Software Engineering · Fall 2026 · Group A
@@ -30,7 +33,7 @@ Planned capabilities include:
 | Database | SQLite |
 | Search | Initial standalone prototype |
 | Shortcut persistence and redirection | Planned |
-| Automated tests / CI | Not yet established |
+| Automated tests / CI | Frontend CI/CD (test, lint, type-check, build, and Vercel production deploy) and Backend CI (lint, type-check, migrations, test, and build) |
 
 The current architecture is expected to evolve as the team implements the product.
 
@@ -141,6 +144,6 @@ No repository-wide `LICENSE` file is currently included. Confirm the team's inte
 
 ## Frontend CI/CD
 
-`.github/workflows/frontend-ci.yml` runs unit tests, frontend lint, TypeScript type-check, and the production build on relevant pushes and pull requests. On a push to `main`, the production deployment job waits for all CI checks to pass, then deploys that commit to Vercel. Pull requests run CI without deploying.
+`.github/workflows/frontend-ci.yml` runs unit tests, frontend lint, TypeScript type-check, and the production build on every pull request and on pushes to `main`. On a push to `main`, the production deployment job waits for those checks, then deploys that commit to Vercel. Pull requests run CI without deploying. `.github/workflows/backend-ci.yml` runs backend lint, type-check, migrations, tests, and the production build on the same events.
 
 Before deployment, create a Vercel project with its **Root Directory** set to `frontend`. From `frontend`, run `vercel link` to obtain the account and project IDs. Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as repository secrets under **GitHub → Settings → Secrets and variables → Actions**. Keep the token private and do not commit the generated `.vercel` folder. Use this GitHub Actions workflow as the production deployment path; avoid an automatic Vercel Git integration that could deploy without the CI checks. The backend is not included because it currently uses local SQLite and lacks production database configuration.
