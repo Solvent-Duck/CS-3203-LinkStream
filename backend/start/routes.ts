@@ -44,6 +44,7 @@ router
     router
       .group(() => {
         router.post('/links', [LinksController, 'store']) // Create new shortcut
+        router.patch('/links/:id', [LinksController, 'update']) // Edit a shortcut
         router.delete('/links/:id', [LinksController, 'destroy']) // Soft/hard delete
       })
       .use(middleware.auth())

@@ -460,6 +460,8 @@ em { font-style: normal; color: #36aa91 }
 .link-tag { background: #f0faf6; color: #2da88f; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px }
 .link-delete { background: none; border: 1px solid transparent; border-radius: 8px; width: 32px; height: 32px; font-size: 18px; color: #ccc; display: flex; align-items: center; justify-content: center; transition: all .15s; flex: none; cursor: pointer }
 .link-delete:hover { border-color: #fecaca; color: #b91c1c; background: #fef2f2 }
+.link-edit { background: none; border: 1px solid #d5e3de; border-radius: 8px; padding: 6px 10px; color: #1f7a67; font-weight: 700; cursor: pointer }
+.link-edit:hover { border-color: #36aa91; background: #edf8f4 }
 
 /* Browser integration tip card */
 .browser-tip-card { background: #f7fbf9; border: 1px solid #d9ede5; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px }
