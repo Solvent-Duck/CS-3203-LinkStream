@@ -46,6 +46,8 @@ jobs:
         run: npm run typecheck
       - name: Run migrations against a fresh SQLite DB
         run: node ace migration:run --force
+      # npm test runs every Japa suite in adonisrc.ts, including
+      # tests/functional/link_deployment.spec.ts (create + redirect).
       - name: Run tests
         run: npm test
       - name: Build backend
