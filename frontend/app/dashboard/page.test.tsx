@@ -52,12 +52,22 @@ describe("DashboardPage", () => {
 
   afterEach(cleanup);
 
-  it("displays a link returned after creating it", async () => {
+  it("creates, displays, and edits a dashboard link", async () => {
     let links: Link[] = [];
     api.getLinks.mockImplementation(async () => links);
     api.createLink.mockImplementation(async () => {
       links = [createdLink];
       return createdLink;
+    });
+
+    const updatedLink = {
+      ...createdLink,
+      title: "FY26 roadmap",
+      destinationUrl: "https://example.com/fy26-roadmap",
+    };
+    api.updateLink.mockImplementation(async () => {
+      links = [updatedLink];
+      return updatedLink;
     });
 
     render(<DashboardPage />);
@@ -82,19 +92,6 @@ describe("DashboardPage", () => {
     expect(screen.getByText("go/product-roadmap")).toBeTruthy();
     expect(screen.getByText("Quarterly priorities")).toBeTruthy();
     expect(screen.getByText("planning")).toBeTruthy();
-  });
-
-  it("edits a displayed link and replaces its card with the saved version", async () => {
-    const updatedLink = { ...createdLink, title: "FY26 roadmap", destinationUrl: "https://example.com/fy26-roadmap" };
-    let links = [createdLink];
-    api.getLinks.mockImplementation(async () => links);
-    api.updateLink.mockImplementation(async () => {
-      links = [updatedLink];
-      return updatedLink;
-    });
-
-    render(<DashboardPage />);
-    await screen.findByText("Product roadmap");
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
     expect(screen.getByRole("heading", { name: "Edit shortcut" })).toBeTruthy();
