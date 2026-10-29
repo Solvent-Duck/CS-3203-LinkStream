@@ -38,7 +38,6 @@ jobs:
         run: python -m unittest discover -s unit-tests -p "test_resource_search.py"
       - name: Run unit tests
         run: npm test
-        working-directory: .
       - name: Lint frontend
         run: npm run lint -- --max-warnings=0
       - name: Type-check frontend
