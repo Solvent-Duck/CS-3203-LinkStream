@@ -32,7 +32,6 @@ jobs:
         run: npm ci
       - name: Run unit tests
         run: npm test
-        working-directory: .
       - name: Lint frontend
         run: npm run lint -- --max-warnings=0
       - name: Type-check frontend
