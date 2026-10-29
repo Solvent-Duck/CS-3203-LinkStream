@@ -159,6 +159,19 @@ export async function createLink(data: {
   return api<Link>("/api/v1/links", { method: "POST", body: data });
 }
 
+export async function updateLink(
+  id: number,
+  data: {
+    slug: string;
+    destinationUrl: string;
+    title: string;
+    description?: string;
+    tags?: string[];
+  }
+) {
+  return api<Link>(`/api/v1/links/${id}`, { method: "PATCH", body: data });
+}
+
 export async function deleteLink(id: number) {
   return api<{ message: string }>(`/api/v1/links/${id}`, {
     method: "DELETE",

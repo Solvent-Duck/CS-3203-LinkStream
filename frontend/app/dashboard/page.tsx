@@ -8,6 +8,7 @@ import {
   type Link,
   getLinks,
   createLink,
+  updateLink,
   deleteLink,
   ApiError,
   API_BASE,
@@ -31,6 +32,13 @@ export default function DashboardPage() {
   const [newDescription, setNewDescription] = useState("");
   const [newTags, setNewTags] = useState("");
   const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editSlug, setEditSlug] = useState("");
+  const [editUrl, setEditUrl] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editTags, setEditTags] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -142,6 +150,52 @@ export default function DashboardPage() {
       setLinks((prev) => prev.filter((l) => l.id !== id));
     } catch {
       setError("Failed to delete link");
+    }
+  }
+
+  function startEditing(link: Link) {
+    setEditingId(link.id);
+    setEditSlug(link.slug);
+    setEditUrl(link.destinationUrl);
+    setEditTitle(link.title);
+    setEditDescription(link.description || "");
+    setEditTags(link.tags.map((tag) => tag.name).join(", "));
+    setError("");
+  }
+
+  function stopEditing() {
+    setEditingId(null);
+  }
+
+  async function handleUpdate(e: React.FormEvent) {
+    e.preventDefault();
+    if (editingId === null) return;
+
+    setSaving(true);
+    setError("");
+    try {
+      const updatedLink = await updateLink(editingId, {
+        slug: editSlug,
+        destinationUrl: editUrl,
+        title: editTitle,
+        description: editDescription || undefined,
+        tags: editTags
+          ? editTags.split(",").map((tag) => tag.trim().toLowerCase())
+          : [],
+      });
+      setLinks((previous) =>
+        previous.map((link) => (link.id === updatedLink.id ? updatedLink : link))
+      );
+      stopEditing();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const data = err.data as { error?: string; errors?: { message: string }[] };
+        setError(data?.error || data?.errors?.[0]?.message || "Failed to update link");
+      } else {
+        setError("Failed to update link");
+      }
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -359,6 +413,45 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {editingId !== null && (
+          <div className="create-form-card">
+            <h2>Edit shortcut</h2>
+            <form onSubmit={handleUpdate}>
+              <div className="create-form-grid">
+                <div>
+                  <label htmlFor="edit-slug">Shortcut slug</label>
+                  <div className="shortcut-field">
+                    <span>go/</span>
+                    <input id="edit-slug" type="text" value={editSlug} onChange={(e) => setEditSlug(e.target.value)} pattern="[a-zA-Z0-9\-_/]+" required />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="edit-url">Destination URL</label>
+                  <input id="edit-url" type="url" value={editUrl} onChange={(e) => setEditUrl(e.target.value)} required />
+                </div>
+                <div>
+                  <label htmlFor="edit-title">Title</label>
+                  <input id="edit-title" type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
+                </div>
+                <div>
+                  <label htmlFor="edit-tags">Tags (comma separated)</label>
+                  <input id="edit-tags" type="text" value={editTags} onChange={(e) => setEditTags(e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="edit-desc">Description (optional)</label>
+                <input id="edit-desc" type="text" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+              </div>
+              <button className="button button-primary" type="submit" disabled={saving} style={{ marginTop: 16 }}>
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+              <button className="button" type="button" onClick={stopEditing} style={{ marginTop: 16, marginLeft: 8 }}>
+                Cancel
+              </button>
+            </form>
+          </div>
+        )}
+
         <div className="dashboard-search">
           <span className="search-symbol">&#x2315;</span>
           <input
@@ -453,6 +546,13 @@ export default function DashboardPage() {
                         </div>
                       )}
                     </div>
+                    <button
+                      type="button"
+                      className="link-edit"
+                      onClick={() => startEditing(link)}
+                    >
+                      Edit
+                    </button>
                     <button
                       className="link-delete"
                       onClick={() => handleDelete(link.id)}
