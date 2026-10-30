@@ -127,6 +127,70 @@ export default class LinksController {
   }
 
   /**
+   * PATCH /api/v1/links/:id
+   * Updates shortcut metadata and replaces tags when supplied.
+   */
+  async update({ params, request, response }: HttpContext) {
+    const validator = vine.compile(
+      vine.object({
+        slug: vine.string().trim().regex(/^[a-zA-Z0-9-_/]+$/).optional(),
+        destinationUrl: vine.string().trim().url().optional(),
+        title: vine.string().trim().maxLength(255).optional(),
+        description: vine.string().trim().optional(),
+        tags: vine.array(vine.string()).optional(),
+      })
+    )
+
+    const payload = await request.validateUsing(validator)
+    const link = await Link.query().where('id', params.id).whereNull('deleted_at').first()
+
+    if (!link) {
+      return response.notFound({ error: 'Link not found' })
+    }
+
+    if (payload.slug && payload.slug !== link.slug) {
+      const existing = await Link.query()
+        .where('slug', payload.slug)
+        .where('id', '!=', link.id)
+        .where((builder) => {
+          if (link.teamId) {
+            builder.where('team_id', link.teamId)
+          } else {
+            builder.whereNull('team_id')
+          }
+        })
+        .whereNull('deleted_at')
+        .first()
+
+      if (existing) {
+        return response.conflict({
+          error: `Shortcut 'go/${payload.slug}' already exists in this scope.`,
+        })
+      }
+    }
+
+    await link.merge({
+      slug: payload.slug ?? link.slug,
+      destinationUrl: payload.destinationUrl ?? link.destinationUrl,
+      title: payload.title ?? link.title,
+      description: payload.description === undefined ? link.description : payload.description || null,
+    }).save()
+
+    if (payload.tags !== undefined) {
+      const tagIds: number[] = []
+      for (const tagName of payload.tags) {
+        const tag = await Tag.firstOrCreate({ name: tagName.toLowerCase() })
+        tagIds.push(tag.id)
+      }
+      await link.related('tags').sync(tagIds)
+    }
+
+    await link.load('tags')
+    await link.load('team')
+    return response.ok(link)
+  }
+
+  /**
    * DELETE /api/v1/links/:id
    * Soft deletes a shortcut
    */

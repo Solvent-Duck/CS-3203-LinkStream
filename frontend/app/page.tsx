@@ -33,7 +33,7 @@ export default function Home() {
               BETTER WORK
             </div>
             <h1 id="hero-title">
-              Everything your team needs,
+              Everything your team needs?
               <br />
               <em>one link away.</em>
             </h1>

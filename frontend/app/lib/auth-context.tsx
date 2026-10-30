@@ -38,12 +38,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
-    const profileRequest = token ? getProfile() : Promise.resolve(null);
-
-    profileRequest
-      .then((profile) => {
-        if (profile) setUser(profile);
-      })
+    if (!token) {
+      // localStorage is only available after mount. Defer the update so the
+      // first client render still matches the server (loading === true).
+      queueMicrotask(() => setLoading(false));
+      return;
+    }
+    getProfile()
+      .then(setUser)
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);

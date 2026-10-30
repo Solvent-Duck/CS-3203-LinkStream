@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333";
+// NEXT_PUBLIC_API_URL is inlined at build time. Set it on Vercel to the Railway
+// public URL, then redeploy. Local dev uses localhost when the variable is unset.
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333";
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
@@ -155,6 +157,19 @@ export async function createLink(data: {
   tags?: string[];
 }) {
   return api<Link>("/api/v1/links", { method: "POST", body: data });
+}
+
+export async function updateLink(
+  id: number,
+  data: {
+    slug: string;
+    destinationUrl: string;
+    title: string;
+    description?: string;
+    tags?: string[];
+  }
+) {
+  return api<Link>(`/api/v1/links/${id}`, { method: "PATCH", body: data });
 }
 
 export async function deleteLink(id: number) {

@@ -1,6 +1,6 @@
 """Simple resource-search helpers for the LinkStream frontend prototype."""
 
-SHORTCUTS = [
+DEFAULT_SHORTCUTS = [
     {"name": "Sprint board", "link": "https://example.com/sprint"},
     {"name": "API docs", "link": "https://example.com/api-docs"},
 ]
@@ -8,9 +8,13 @@ SHORTCUTS = [
 ADMIN_IDS = {"admin_123"}
 
 
-def get_shortcuts():
-    """Return the available resource shortcuts without exposing the source list."""
-    return SHORTCUTS.copy()
+def get_shortcuts(shortcuts=None):
+    """Return a copy of valid shortcuts, including an empty or one-item list."""
+    source = DEFAULT_SHORTCUTS if shortcuts is None else shortcuts
+    if not isinstance(source, list):
+        return []
+
+    return source.copy()
 
 
 def verify_admin_permission(user_id):

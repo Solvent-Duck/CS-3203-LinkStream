@@ -1,3 +1,5 @@
+import { isAllowedProductionOrigin } from '#services/cors_allowlist'
+import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/cors'
 
@@ -14,11 +16,14 @@ const corsConfig = defineConfig({
   enabled: true,
 
   /**
-   * In development, allow every origin to simplify local front/backend setup.
-   * In production, keep an explicit allowlist (empty by default, so no
-   * cross-origin browser access is allowed until configured).
+   * Development and tests allow every origin so local front/backend setup
+   * stays simple. Production reflects an allowlist: CORS_ORIGIN plus the
+   * Vercel app (https://project-wwc99.vercel.app and its preview hosts).
+   * credentials is true, so a `*` origin is not used.
    */
-  origin: app.inDev ? true : [],
+  origin: app.inProduction
+    ? (requestOrigin: string) => isAllowedProductionOrigin(requestOrigin, env.get('CORS_ORIGIN'))
+    : true,
 
   /**
    * HTTP methods accepted for cross-origin requests.

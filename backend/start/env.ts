@@ -24,4 +24,24 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+
+  /*
+   * Database.
+   * Development and tests default to SQLite. Production defaults to PostgreSQL.
+   * Prefer DATABASE_URL (Railway injects this). Discrete DB_* vars are the fallback.
+   */
+  DB_CONNECTION: Env.schema.enum.optional(['sqlite', 'pg'] as const),
+  DATABASE_URL: Env.schema.string.optional(),
+  DB_HOST: Env.schema.string.optional(),
+  DB_PORT: Env.schema.number.optional(),
+  DB_USER: Env.schema.string.optional(),
+  DB_PASSWORD: Env.schema.string.optional(),
+  DB_DATABASE: Env.schema.string.optional(),
+  DB_SSL: Env.schema.boolean.optional(),
+
+  /*
+   * Comma-separated browser origins for production CORS.
+   * https://project-wwc99.vercel.app is always allowed in addition to this list.
+   */
+  CORS_ORIGIN: Env.schema.string.optional(),
 })
