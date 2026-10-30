@@ -51,7 +51,7 @@ backend/                   AdonisJS backend
 
 ## Development setup
 
-**Requirements:** Git, Node.js 24+, and npm.
+**Requirements:** Git, Node.js 24+, npm, and Python 3.12+.
 
 ```bash
 git clone https://github.com/Solvent-Duck/CS-3203-LinkStream.git
@@ -82,6 +82,17 @@ npm run dev
 ```
 
 The frontend runs locally on port `3000` by default.
+
+### ResourceSearch unit test
+
+From the `frontend` directory, run the ResourceSearch unit test with:
+
+```bash
+python -m unittest discover -s unit-tests -p "test_resource_search.py"
+```
+
+The test covers available shortcuts, an empty list, a one-shortcut boundary case,
+invalid input, and valid and invalid administrator permissions.
 
 ## API documentation
 

@@ -23,6 +23,9 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -30,6 +33,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install frontend dependencies
         run: npm ci
+      - name: Run ResourceSearch unit tests
+        run: python -m unittest discover -s unit-tests -p "test_resource_search.py"
       - name: Run unit tests
         run: npm test
         working-directory: .
