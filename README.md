@@ -103,13 +103,15 @@ Sprint 1 API payloads and JSON schemas are documented in [`docs/api/payloads-and
 Available project checks include:
 
 ```bash
-# frontend/
+cd frontend
 npm run lint
 npm run build
 ```
 
 ```bash
-# backend/
+cd backend
+
+# Code quality checks
 npm run lint
 npm run typecheck
 npm run build
