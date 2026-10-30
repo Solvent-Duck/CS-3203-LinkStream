@@ -121,7 +121,7 @@ npm run build
 # Run all backend tests
 npm test
 
-# Run Tag Name validation test specifically
+# Run Tag Name validation unit test specifically
 node ace test unit --files="tests/unit/tag_name.spec.ts"
 
 ```
