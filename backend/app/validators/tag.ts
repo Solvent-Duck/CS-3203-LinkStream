@@ -16,9 +16,4 @@ Used in LinksController (Store and update) via vine.array(tagNameSchema())
 */
 
 export const tagNameSchema = () =>
-  vine
-    .string()
-    .trim()
-    .toLowerCase()
-    .minLength(MIN_TAG_LENGTH)
-    .maxLength(MAX_TAG_LENGTH)
+  vine.string().trim().toLowerCase().minLength(MIN_TAG_LENGTH).maxLength(MAX_TAG_LENGTH)

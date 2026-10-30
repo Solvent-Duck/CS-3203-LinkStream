@@ -8,7 +8,7 @@ import { tagNameSchema, MIN_TAG_LENGTH, MAX_TAG_LENGTH } from '../../app/validat
 const validate = (value: unknown) => vine.compile(tagNameSchema()).validate(value)
 
 test.group('Tag name validation', () => {
-// Valid Input
+  // Valid Input
   test('accepts a valid tag', async ({ assert }) => {
     assert.equal(await validate('tech'), 'tech')
   })
@@ -17,7 +17,6 @@ test.group('Tag name validation', () => {
   test('accepts the minimum length', async ({ assert }) => {
     assert.equal(await validate('a'.repeat(MIN_TAG_LENGTH)), 'aa')
   })
-
 
   // Boundary: accepts exactly maximum length of 15
   test('accepts the maximum length', async ({ assert }) => {

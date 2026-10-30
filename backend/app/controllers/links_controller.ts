@@ -134,7 +134,11 @@ export default class LinksController {
   async update({ params, request, response }: HttpContext) {
     const validator = vine.compile(
       vine.object({
-        slug: vine.string().trim().regex(/^[a-zA-Z0-9-_/]+$/).optional(),
+        slug: vine
+          .string()
+          .trim()
+          .regex(/^[a-zA-Z0-9-_/]+$/)
+          .optional(),
         destinationUrl: vine.string().trim().url().optional(),
         title: vine.string().trim().maxLength(255).optional(),
         description: vine.string().trim().optional(),
@@ -170,12 +174,15 @@ export default class LinksController {
       }
     }
 
-    await link.merge({
-      slug: payload.slug ?? link.slug,
-      destinationUrl: payload.destinationUrl ?? link.destinationUrl,
-      title: payload.title ?? link.title,
-      description: payload.description === undefined ? link.description : payload.description || null,
-    }).save()
+    await link
+      .merge({
+        slug: payload.slug ?? link.slug,
+        destinationUrl: payload.destinationUrl ?? link.destinationUrl,
+        title: payload.title ?? link.title,
+        description:
+          payload.description === undefined ? link.description : payload.description || null,
+      })
+      .save()
 
     if (payload.tags !== undefined) {
       const tagIds: number[] = []
