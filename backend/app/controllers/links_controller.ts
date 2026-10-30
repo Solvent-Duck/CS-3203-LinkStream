@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import Link from '#models/link'
 import Tag from '#models/tag'
 import vine from '@vinejs/vine'
+import { tagNameSchema } from '#validators/tag'
 
 export default class LinksController {
   /**
@@ -54,7 +55,7 @@ export default class LinksController {
         title: vine.string().trim().maxLength(255),
         description: vine.string().trim().optional(),
         teamId: vine.number().optional(),
-        tags: vine.array(vine.string()).optional(),
+        tags: vine.array(tagNameSchema()).distinct().optional(),
       })
     )
 
@@ -133,11 +134,15 @@ export default class LinksController {
   async update({ params, request, response }: HttpContext) {
     const validator = vine.compile(
       vine.object({
-        slug: vine.string().trim().regex(/^[a-zA-Z0-9-_/]+$/).optional(),
+        slug: vine
+          .string()
+          .trim()
+          .regex(/^[a-zA-Z0-9-_/]+$/)
+          .optional(),
         destinationUrl: vine.string().trim().url().optional(),
         title: vine.string().trim().maxLength(255).optional(),
         description: vine.string().trim().optional(),
-        tags: vine.array(vine.string()).optional(),
+        tags: vine.array(tagNameSchema()).distinct().optional(),
       })
     )
 
@@ -169,12 +174,15 @@ export default class LinksController {
       }
     }
 
-    await link.merge({
-      slug: payload.slug ?? link.slug,
-      destinationUrl: payload.destinationUrl ?? link.destinationUrl,
-      title: payload.title ?? link.title,
-      description: payload.description === undefined ? link.description : payload.description || null,
-    }).save()
+    await link
+      .merge({
+        slug: payload.slug ?? link.slug,
+        destinationUrl: payload.destinationUrl ?? link.destinationUrl,
+        title: payload.title ?? link.title,
+        description:
+          payload.description === undefined ? link.description : payload.description || null,
+      })
+      .save()
 
     if (payload.tags !== undefined) {
       const tagIds: number[] = []
