@@ -104,6 +104,8 @@ Available project checks include:
 
 ```bash
 cd frontend
+
+# Code quality checks
 npm run lint
 npm run build
 ```
