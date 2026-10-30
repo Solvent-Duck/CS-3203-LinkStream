@@ -94,6 +94,25 @@ python -m unittest discover -s unit-tests -p "test_resource_search.py"
 The test covers available shortcuts, an empty list, a one-shortcut boundary case,
 invalid input, and valid and invalid administrator permissions.
 
+### Sprint 1 core logic unit tests (code review)
+
+`backend/tests/unit/redirect_and_links.spec.ts` covers slug validation, destination
+URL and title validation, link creation and storage (including duplicate-slug
+conflicts), and redirect resolution with click counting. From a fresh clone:
+
+```bash
+git clone https://github.com/Solvent-Duck/CS-3203-LinkStream.git
+cd CS-3203-LinkStream/backend
+npm ci
+cp .env.example .env
+node ace generate:key
+node ace migration:run
+node ace test unit --files="tests/unit/redirect_and_links.spec.ts" --reporters=spec
+```
+
+A passing run lists every test with a check mark and ends with `PASSED` and
+`Tests 33 passed (33)`. Run `npm test` to run the full backend suite.
+
 ## API documentation
 
 Sprint 1 API payloads and JSON schemas are documented in [`docs/api/payloads-and-json-schemas.md`](docs/api/payloads-and-json-schemas.md). The schema bundle is transport-neutral so route definitions and HTTP error semantics can evolve independently.
