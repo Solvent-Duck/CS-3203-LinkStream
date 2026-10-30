@@ -10,7 +10,15 @@
 |
 */
 
+import { randomBytes } from 'node:crypto'
+
 process.env.NODE_ENV = 'test'
+
+/**
+ * Tests only need some APP_KEY, so generate a throwaway one when none
+ * is set. Reviewers can then run `npm test` without `node ace generate:key`.
+ */
+process.env.APP_KEY ??= randomBytes(32).toString('base64url')
 
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'

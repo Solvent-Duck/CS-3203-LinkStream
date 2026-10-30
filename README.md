@@ -104,11 +104,12 @@ conflicts), and redirect resolution with click counting. From a fresh clone:
 git clone https://github.com/Solvent-Duck/CS-3203-LinkStream.git
 cd CS-3203-LinkStream/backend
 npm ci
-cp .env.example .env
-node ace generate:key
-node ace migration:run
 node ace test unit --files="tests/unit/redirect_and_links.spec.ts" --reporters=spec
 ```
+
+No `.env`, `APP_KEY` or migration step is needed. Tests read defaults from
+`backend/.env.test`, generate a throwaway `APP_KEY`, and migrate the local SQLite
+database before running.
 
 A passing run lists every test with a check mark and ends with `PASSED` and
 `Tests 33 passed (33)`. Run `npm test` to run the full backend suite.

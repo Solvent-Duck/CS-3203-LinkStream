@@ -41,7 +41,15 @@ export const plugins: Config['plugins'] = [
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  /**
+   * Apply pending migrations so a fresh clone does not need
+   * `node ace migration:run`. No rollback, so the local DB keeps its schema.
+   */
+  setup: [
+    async () => {
+      await testUtils.db().migrate()
+    },
+  ],
   teardown: [],
 }
 
