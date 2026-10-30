@@ -1,9 +1,15 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Link from '#models/link'
-import Tag from '#models/tag'
 import vine from '@vinejs/vine'
 import { tagNameSchema } from '#validators/tag'
+import { destinationUrlSchema, linkSlugSchema, linkTitleSchema } from '#validators/link'
+import {
+  createLink,
+  findSlugConflict,
+  resolveTagIds,
+  SlugConflictError,
+} from '#services/link_service'
 
 export default class LinksController {
   /**
@@ -47,12 +53,9 @@ export default class LinksController {
   async store({ request, response, auth }: HttpContext) {
     const validator = vine.compile(
       vine.object({
-        slug: vine
-          .string()
-          .trim()
-          .regex(/^[a-zA-Z0-9-_/]+$/),
-        destinationUrl: vine.string().trim().url(),
-        title: vine.string().trim().maxLength(255),
+        slug: linkSlugSchema(),
+        destinationUrl: destinationUrlSchema(),
+        title: linkTitleSchema(),
         description: vine.string().trim().optional(),
         teamId: vine.number().optional(),
         tags: vine.array(tagNameSchema()).distinct().optional(),
@@ -62,45 +65,14 @@ export default class LinksController {
     const payload = await request.validateUsing(validator)
     const user = auth.getUserOrFail()
 
-    // Check collision in target scope
-    const existing = await Link.query()
-      .where('slug', payload.slug)
-      .where((b) => {
-        if (payload.teamId) {
-          b.where('team_id', payload.teamId)
-        } else {
-          b.whereNull('team_id')
-        }
-      })
-      .whereNull('deleted_at')
-      .first()
-
-    if (existing) {
-      return response.conflict({
-        error: `Shortcut 'go/${payload.slug}' already exists in this scope.`,
-      })
-    }
-
-    const link = await Link.create({
-      slug: payload.slug,
-      destinationUrl: payload.destinationUrl,
-      title: payload.title,
-      description: payload.description || null,
-      teamId: payload.teamId || null,
-      userId: user.id,
-      isActive: true,
-      healthStatus: 'healthy',
-      clickCount: 0,
-    })
-
-    // Attach tags if provided
-    if (payload.tags && payload.tags.length > 0) {
-      const tagIds: number[] = []
-      for (const tagName of payload.tags) {
-        const tag = await Tag.firstOrCreate({ name: tagName.toLowerCase() })
-        tagIds.push(tag.id)
+    let link
+    try {
+      link = await createLink({ ...payload, userId: user.id })
+    } catch (error) {
+      if (error instanceof SlugConflictError) {
+        return response.conflict({ error: error.message })
       }
-      await link.related('tags').attach(tagIds)
+      throw error
     }
 
     await link.load('tags')
@@ -134,13 +106,9 @@ export default class LinksController {
   async update({ params, request, response }: HttpContext) {
     const validator = vine.compile(
       vine.object({
-        slug: vine
-          .string()
-          .trim()
-          .regex(/^[a-zA-Z0-9-_/]+$/)
-          .optional(),
-        destinationUrl: vine.string().trim().url().optional(),
-        title: vine.string().trim().maxLength(255).optional(),
+        slug: linkSlugSchema().optional(),
+        destinationUrl: destinationUrlSchema().optional(),
+        title: linkTitleSchema().optional(),
         description: vine.string().trim().optional(),
         tags: vine.array(tagNameSchema()).distinct().optional(),
       })
@@ -154,22 +122,11 @@ export default class LinksController {
     }
 
     if (payload.slug && payload.slug !== link.slug) {
-      const existing = await Link.query()
-        .where('slug', payload.slug)
-        .where('id', '!=', link.id)
-        .where((builder) => {
-          if (link.teamId) {
-            builder.where('team_id', link.teamId)
-          } else {
-            builder.whereNull('team_id')
-          }
-        })
-        .whereNull('deleted_at')
-        .first()
+      const existing = await findSlugConflict(payload.slug, link.teamId, link.id)
 
       if (existing) {
         return response.conflict({
-          error: `Shortcut 'go/${payload.slug}' already exists in this scope.`,
+          error: new SlugConflictError(payload.slug).message,
         })
       }
     }
@@ -185,12 +142,7 @@ export default class LinksController {
       .save()
 
     if (payload.tags !== undefined) {
-      const tagIds: number[] = []
-      for (const tagName of payload.tags) {
-        const tag = await Tag.firstOrCreate({ name: tagName.toLowerCase() })
-        tagIds.push(tag.id)
-      }
-      await link.related('tags').sync(tagIds)
+      await link.related('tags').sync(await resolveTagIds(payload.tags))
     }
 
     await link.load('tags')
