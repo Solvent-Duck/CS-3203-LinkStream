@@ -33,6 +33,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install frontend dependencies
         run: npm ci
+      - name: Run resource search unit tests
       - name: Run ResourceSearch unit tests
         run: python -m unittest discover -s unit-tests -p "test_resource_search.py"
       - name: Run unit tests

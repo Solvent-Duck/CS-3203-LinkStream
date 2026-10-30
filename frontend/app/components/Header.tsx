@@ -56,17 +56,17 @@ export default function Header() {
           </div>
           {!loading && (
             user ? (
-              <a className="nav-cta" href="/dashboard" onClick={closeMenu}>
+              <Link className="nav-cta" href="/dashboard" onClick={closeMenu}>
                 Dashboard <span aria-hidden="true">&#x2197;</span>
-              </a>
+              </Link>
             ) : (
               <div className="nav-auth">
-                <a className="nav-login" href="/login" onClick={closeMenu}>
+                <Link className="nav-login" href="/login" onClick={closeMenu}>
                   Sign in
-                </a>
-                <a className="nav-cta" href="/signup" onClick={closeMenu}>
+                </Link>
+                <Link className="nav-cta" href="/signup" onClick={closeMenu}>
                   Get started <span aria-hidden="true">&#x2197;</span>
-                </a>
+                </Link>
               </div>
             )
           )}
