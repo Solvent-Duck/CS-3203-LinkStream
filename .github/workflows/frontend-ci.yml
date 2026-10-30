@@ -30,6 +30,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -38,6 +42,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install frontend dependencies
         run: npm ci
+      - name: Run resource search unit tests
+        run: python -m unittest test_resource_search.py
       - name: Run unit tests
         run: npm test
         working-directory: .
