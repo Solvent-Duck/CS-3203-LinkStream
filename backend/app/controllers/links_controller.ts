@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import Link from '#models/link'
 import Tag from '#models/tag'
 import vine from '@vinejs/vine'
+import { tagNameSchema } from '#validators/tag'
 
 export default class LinksController {
   /**
@@ -54,7 +55,7 @@ export default class LinksController {
         title: vine.string().trim().maxLength(255),
         description: vine.string().trim().optional(),
         teamId: vine.number().optional(),
-        tags: vine.array(vine.string()).optional(),
+        tags: vine.array(tagNameSchema()).distinct().optional(),
       })
     )
 
@@ -137,7 +138,7 @@ export default class LinksController {
         destinationUrl: vine.string().trim().url().optional(),
         title: vine.string().trim().maxLength(255).optional(),
         description: vine.string().trim().optional(),
-        tags: vine.array(vine.string()).optional(),
+        tags: vine.array(tagNameSchema()).distinct().optional(),
       })
     )
 
