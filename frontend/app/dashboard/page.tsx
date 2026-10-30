@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/lib/auth-context";
 import {
@@ -45,10 +46,6 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    if (user) fetchLinks();
-  }, [user, fetchLinks]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -119,7 +116,7 @@ export default function DashboardPage() {
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="container dashboard-header-inner">
-          <a className="brand" href="/">
+          <NextLink className="brand" href="/">
             <span className="brand-mark" aria-hidden="true">
               <span></span>
               <span></span>
@@ -128,7 +125,7 @@ export default function DashboardPage() {
               link<span className="brand-accent">stream</span>
               <sup>&reg;</sup>
             </span>
-          </a>
+          </NextLink>
           <div className="dashboard-user">
             <span className="dashboard-avatar">
               {user.initials}

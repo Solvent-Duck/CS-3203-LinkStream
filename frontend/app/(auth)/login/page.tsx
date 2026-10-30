@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/lib/auth-context";
 import { ApiError } from "@/app/lib/api";
@@ -35,7 +36,7 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <a className="brand" href="/">
+        <Link className="brand" href="/">
           <span className="brand-mark" aria-hidden="true">
             <span></span>
             <span></span>
@@ -44,7 +45,7 @@ export default function LoginPage() {
             link<span className="brand-accent">stream</span>
             <sup>&reg;</sup>
           </span>
-        </a>
+        </Link>
         <h1>Welcome back</h1>
         <p className="auth-subtitle">Sign in to your account</p>
 
@@ -82,7 +83,7 @@ export default function LoginPage() {
 
         <p className="auth-switch">
           Don&apos;t have an account?{" "}
-          <a href="/signup">Create one</a>
+          <Link href="/signup">Create one</Link>
         </p>
       </div>
     </div>

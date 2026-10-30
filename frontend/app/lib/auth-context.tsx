@@ -38,12 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-    getProfile()
-      .then(setUser)
+    const profileRequest = token ? getProfile() : Promise.resolve(null);
+
+    profileRequest
+      .then((profile) => {
+        if (profile) setUser(profile);
+      })
       .catch(() => clearToken())
       .finally(() => setLoading(false));
   }, []);
