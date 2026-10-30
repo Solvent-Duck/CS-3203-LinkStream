@@ -112,8 +112,14 @@ npm run build
 # backend/
 npm run lint
 npm run typecheck
-npm test
 npm run build
+
+# Run all backend tests
+npm test
+
+# Run Tag Name validation test specifically
+node ace test unit --files="tests/unit/tag_name.spec.ts"
+
 ```
 
 Testing and CI coverage will expand with the application.
