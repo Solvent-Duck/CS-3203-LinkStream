@@ -14,7 +14,7 @@ import {
   API_BASE,
 } from "@/app/lib/api";
 
-export default function DashboardPage() {
+export default function LinkDashboard() {
   const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
   const [links, setLinks] = useState<Link[]>([]);
@@ -30,7 +30,7 @@ export default function DashboardPage() {
   const [newUrl, setNewUrl] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newTags, setNewTags] = useState("");
+  const [customLabels, setCustomLabels] = useState("");
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editSlug, setEditSlug] = useState("");
@@ -46,7 +46,7 @@ export default function DashboardPage() {
     }
   }, [authLoading, user, router]);
 
-  const fetchLinks = useCallback(async (query?: string) => {
+  const resourceSearch = useCallback(async (query?: string) => {
     setLoading(true);
     try {
       const data = await getLinks(query ? { query } : undefined);
@@ -60,28 +60,28 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    // fetchLinks sets loading immediately. Run it after this effect so the
+    // resourceSearch sets loading immediately. Run it after this effect so the
     // update is not a synchronous setState in the effect body.
     queueMicrotask(() => {
-      void fetchLinks();
+      void resourceSearch();
     });
-  }, [user, fetchLinks]);
+  }, [user, resourceSearch]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (user) fetchLinks(search || undefined);
+      if (user) resourceSearch(search || undefined);
     }, 300);
     return () => clearTimeout(timeout);
-  }, [search, user, fetchLinks]);
+  }, [search, user, resourceSearch]);
 
   // Automatically refresh click counts when returning to the dashboard tab
   useEffect(() => {
     function onFocus() {
-      if (user) fetchLinks(search || undefined);
+      if (user) resourceSearch(search || undefined);
     }
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
-  }, [user, search, fetchLinks]);
+  }, [user, search, resourceSearch]);
 
   function getRedirectUrl(link: Link) {
     if (link.team?.slug) {
@@ -108,7 +108,7 @@ export default function DashboardPage() {
     }
   }
 
-  async function handleCreate(e: React.FormEvent) {
+  async function handleLinkCreation(e: React.FormEvent) {
     e.preventDefault();
     setCreating(true);
     setError("");
@@ -118,17 +118,17 @@ export default function DashboardPage() {
         destinationUrl: newUrl,
         title: newTitle,
         description: newDescription || undefined,
-        tags: newTags
-          ? newTags.split(",").map((t) => t.trim().toLowerCase())
+        tags: customLabels
+          ? customLabels.split(",").map((t) => t.trim().toLowerCase())
           : undefined,
       });
       setNewSlug("");
       setNewUrl("");
       setNewTitle("");
       setNewDescription("");
-      setNewTags("");
+      setCustomLabels("");
       setShowCreate(false);
-      fetchLinks();
+      resourceSearch();
     } catch (err) {
       if (err instanceof ApiError) {
         const data = err.data as {
@@ -241,7 +241,7 @@ export default function DashboardPage() {
       <main className="container dashboard-main">
         <div className="dashboard-top">
           <div>
-            <h1>Your links</h1>
+            <h1>Link Dashboard</h1>
             <p className="dashboard-subtitle">
               Manage your team&apos;s shortcuts
             </p>
@@ -340,8 +340,8 @@ export default function DashboardPage() {
 
         {showCreate && (
           <div className="create-form-card">
-            <h2>Create a new shortcut</h2>
-            <form onSubmit={handleCreate}>
+            <h2>Link Creation Function</h2>
+            <form onSubmit={handleLinkCreation}>
               <div className="create-form-grid">
                 <div>
                   <label htmlFor="new-slug">Shortcut slug</label>
@@ -381,12 +381,12 @@ export default function DashboardPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-tags">Tags (comma separated)</label>
+                  <label htmlFor="new-tags">Custom Labels (comma separated)</label>
                   <input
                     id="new-tags"
                     type="text"
-                    value={newTags}
-                    onChange={(e) => setNewTags(e.target.value)}
+                    value={customLabels}
+                    onChange={(e) => setCustomLabels(e.target.value)}
                     placeholder="planning, product"
                   />
                 </div>
@@ -407,7 +407,7 @@ export default function DashboardPage() {
                 disabled={creating}
                 style={{ marginTop: 16 }}
               >
-                {creating ? "Creating..." : "Create shortcut"}
+                {creating ? "Creating..." : "Create link"}
               </button>
             </form>
           </div>
@@ -415,7 +415,7 @@ export default function DashboardPage() {
 
         {editingId !== null && (
           <div className="create-form-card">
-            <h2>Edit shortcut</h2>
+            <h2>Link Dashboard: Edit link</h2>
             <form onSubmit={handleUpdate}>
               <div className="create-form-grid">
                 <div>
@@ -434,7 +434,7 @@ export default function DashboardPage() {
                   <input id="edit-title" type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required />
                 </div>
                 <div>
-                  <label htmlFor="edit-tags">Tags (comma separated)</label>
+                  <label htmlFor="edit-tags">Custom Labels (comma separated)</label>
                   <input id="edit-tags" type="text" value={editTags} onChange={(e) => setEditTags(e.target.value)} />
                 </div>
               </div>
@@ -458,7 +458,8 @@ export default function DashboardPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search links, tags, URLs..."
+            aria-label="Resource Search"
+            placeholder="Search resources, labels, or URLs..."
           />
         </div>
 

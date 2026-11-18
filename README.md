@@ -37,6 +37,16 @@ Planned capabilities include:
 
 The current architecture is expected to evolve as the team implements the product.
 
+## Submitted features
+
+| Feature | Location | Description |
+| --- | --- | --- |
+| LinkDashboard | `frontend/app/dashboard/page.tsx` | Displays the team's saved links and supports copying, editing, and deleting them. |
+| ResourceSearch | `frontend/app/dashboard/page.tsx` | Searches resources by link details and updates the dashboard results. |
+| CustomLabels | `frontend/app/dashboard/page.tsx` and `backend/app/models/tag.ts` | Lets users add comma-separated labels to a link for organization. |
+| Backend API Doc | `docs/api/payloads-and-json-schemas.md` | Documents the API payloads and JSON schemas used by the backend. |
+| Link Creation Function | `frontend/app/dashboard/page.tsx` and `backend/app/controllers/links_controller.ts` | Validates and creates a new link with its destination, title, description, and labels. |
+
 ## Repository structure
 
 ```text
@@ -114,7 +124,7 @@ database before running.
 A passing run lists every test with a check mark and ends with `PASSED` and
 `Tests 33 passed (33)`. Run `npm test` to run the full backend suite.
 
-## API documentation
+## Backend API Doc
 
 Sprint 1 API payloads and JSON schemas are documented in [`docs/api/payloads-and-json-schemas.md`](docs/api/payloads-and-json-schemas.md). The schema bundle is transport-neutral so route definitions and HTTP error semantics can evolve independently.
 

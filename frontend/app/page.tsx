@@ -137,7 +137,7 @@ export default function Home() {
                   </div>
                   <div className="app-search">
                     <span className="search-symbol">&#x2315;</span>
-                    <span>Search links, people, and collections...</span>
+                  <span>Resource Search</span>
                     <kbd>&#x2318; K</kbd>
                   </div>
                   <div className="app-content-head">

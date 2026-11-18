@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import DashboardPage from "../app/dashboard/page";
+import LinkDashboard from "../app/dashboard/page";
 import type { Link } from "@/app/lib/api";
 
 const api = vi.hoisted(() => ({
@@ -43,7 +43,7 @@ const createdLink: Link = {
   tags: [{ id: 2, name: "planning" }],
 };
 
-describe("DashboardPage", () => {
+describe("LinkDashboard", () => {
   beforeEach(() => {
     api.getLinks.mockReset();
     api.createLink.mockReset();
@@ -71,7 +71,7 @@ describe("DashboardPage", () => {
       return updatedLink;
     });
 
-    render(<DashboardPage />);
+    render(<LinkDashboard />);
     await screen.findByText("No links yet. Create your first shortcut!");
 
     fireEvent.click(screen.getByRole("button", { name: /new link/i }));
@@ -79,8 +79,8 @@ describe("DashboardPage", () => {
     fireEvent.change(screen.getByLabelText("Destination URL"), { target: { value: createdLink.destinationUrl } });
     fireEvent.change(screen.getByLabelText("Title"), { target: { value: createdLink.title } });
     fireEvent.change(screen.getByLabelText("Description (optional)"), { target: { value: createdLink.description } });
-    fireEvent.change(screen.getByLabelText("Tags (comma separated)"), { target: { value: "planning" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create shortcut" }));
+    fireEvent.change(screen.getByLabelText("Custom Labels (comma separated)"), { target: { value: "planning" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create link" }));
 
     await screen.findByText("Product roadmap");
     expect(api.createLink).toHaveBeenCalledWith({
@@ -95,7 +95,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("planning")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
-    expect(screen.getByRole("heading", { name: "Edit shortcut" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Link Dashboard: Edit link" })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Title"), { target: { value: updatedLink.title } });
     fireEvent.change(screen.getByLabelText("Destination URL"), { target: { value: updatedLink.destinationUrl } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
