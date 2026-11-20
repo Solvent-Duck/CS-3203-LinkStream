@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import Link from '#models/link'
 import Team from '#models/team'
 import User from '#models/user'
-import { resetThrottle } from '#middleware/throttle_middleware'
+import { resetThrottle } from '#middleware/tag_throttle_middleware'
 import { MAX_TAGS_PER_LINK } from '#validators/tag'
 
 const TABLES = [
@@ -574,15 +574,40 @@ test.group('Link deployment / resource limits (CWE-770)', (group) => {
     assert.equal(Number(tagCount[0].total), 2)
   })
 
-  test('returns 429 after too many writes from one user', async ({ client, assert }) => {
+  test('returns 429 after too many tag writes from one user', async ({ client, assert }) => {
     const user = await createOwner()
     let last
 
     for (let i = 0; i < 21; i++) {
       last = await client
         .post('/api/v1/links')
-        .json({ slug: `burst-${i}`, destinationUrl: DESTINATION, title: 'Burst' })
+        .json({ slug: `burst-${i}`, destinationUrl: DESTINATION, title: 'Burst', tags: ['spam'] })
         .loginAs(user)
+    }
+
+    last!.assertStatus(429)
+    assert.exists(last!.header('retry-after'))
+  })
+
+  test('does not throttle link writes that do not use tags', async ({ client }) => {
+    const user = await createOwner()
+    let last
+
+    for (let i = 0; i < 21; i++) {
+      last = await client
+        .post('/api/v1/links')
+        .json({ slug: `plain-${i}`, destinationUrl: DESTINATION, title: 'Plain' })
+        .loginAs(user)
+    }
+
+    last!.assertCreated()
+  })
+
+  test('returns 429 after too many tag filter searches', async ({ client, assert }) => {
+    let last
+
+    for (let i = 0; i < 61; i++) {
+      last = await client.get('/api/v1/links').qs({ tag: 'devops' })
     }
 
     last!.assertStatus(429)

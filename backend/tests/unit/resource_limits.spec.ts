@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import vine from '@vinejs/vine'
 import { tagListSchema, MAX_TAGS_PER_LINK } from '../../app/validators/tag.js'
-import { hit, resetThrottle } from '../../app/middleware/throttle_middleware.js'
+import { hit, resetThrottle } from '../../app/middleware/tag_throttle_middleware.js'
 
 // CWE-770: Allocation of Resources Without Limits or Throttling
 

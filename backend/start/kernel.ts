@@ -46,5 +46,5 @@ router.use([
  */
 export const middleware = router.named({
   auth: () => import('#middleware/auth_middleware'),
-  throttle: () => import('#middleware/throttle_middleware'),
+  tagThrottle: () => import('#middleware/tag_throttle_middleware'),
 })

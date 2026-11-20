@@ -18,11 +18,6 @@ const bodyParserConfig = defineConfig({
     convertEmptyStringsToNull: true,
 
     /**
-     * CWE-770: largest accepted form body. The API only takes small payloads.
-     */
-    limit: '1mb',
-
-    /**
      * Content types handled by the form parser.
      */
     types: ['application/x-www-form-urlencoded'],
@@ -36,11 +31,6 @@ const bodyParserConfig = defineConfig({
      * Normalize empty string values to null.
      */
     convertEmptyStringsToNull: true,
-
-    /**
-     * CWE-770: largest accepted JSON body. Oversized bodies get HTTP 413.
-     */
-    limit: '1mb',
 
     /**
      * Content types handled by the JSON parser.
@@ -75,9 +65,8 @@ const bodyParserConfig = defineConfig({
 
     /**
      * Maximum accepted payload size for multipart requests.
-     * CWE-770: no route accepts file uploads, so keep this small.
      */
-    limit: '1mb',
+    limit: '20mb',
 
     /**
      * Content types handled by the multipart parser.

@@ -2,20 +2,25 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 /**
- * CWE-770: limits how many requests one client can make in a time window.
+ * CWE-770 (Tag Manager): limits how often one client can use tags.
+ *
+ * Only requests that use the tag feature are counted:
+ *   - writes that send a `tags` list (create or edit a link's tags)
+ *   - reads that filter by `?tag=`
+ * Other link requests pass straight through.
  *
  * Clients are keyed by user id when logged in, otherwise by IP address.
  * Counts live in memory (fixed window), so each server process has its own
  * counters. Over the limit, the request gets HTTP 429 with Retry-After.
  *
- * Usage in routes: .use(middleware.throttle({ max: 20, windowMs: 60_000 }))
+ * Usage in routes: .use(middleware.tagThrottle({ max: 20, windowMs: 60_000 }))
  */
 export type ThrottleOptions = {
-  /** Most requests allowed per window. */
+  /** Most tag requests allowed per window. */
   max: number
   /** Window length in milliseconds. */
   windowMs: number
-  /** Separates counters for different route groups. */
+  /** Separates counters for different routes. */
   name?: string
 }
 
@@ -62,11 +67,20 @@ export function hit(key: string, options: ThrottleOptions, now = Date.now()) {
   }
 }
 
-export default class ThrottleMiddleware {
+/** True when the request uses the tag feature. */
+export function usesTags(ctx: HttpContext) {
+  return ctx.request.input('tags') !== undefined || Boolean(ctx.request.qs().tag)
+}
+
+export default class TagThrottleMiddleware {
   async handle(ctx: HttpContext, next: NextFn, options: ThrottleOptions) {
+    if (!usesTags(ctx)) {
+      return next()
+    }
+
     const user = ctx.auth?.user
     const client = user ? `user:${user.id}` : `ip:${ctx.request.ip()}`
-    const key = `${options.name ?? ctx.route?.pattern ?? 'global'}|${client}`
+    const key = `${options.name ?? ctx.route?.pattern ?? 'tags'}|${client}`
 
     const result = hit(key, options)
 
@@ -76,7 +90,7 @@ export default class ThrottleMiddleware {
     if (!result.allowed) {
       ctx.response.header('Retry-After', String(result.retryAfterSeconds))
       return ctx.response.tooManyRequests({
-        error: 'Too many requests. Please try again later.',
+        error: 'Too many tag requests. Please try again later.',
       })
     }
 
