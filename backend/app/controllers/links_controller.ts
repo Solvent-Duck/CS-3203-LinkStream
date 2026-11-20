@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Link from '#models/link'
 import vine from '@vinejs/vine'
-import { tagNameSchema } from '#validators/tag'
+import { tagListSchema } from '#validators/tag'
 import { destinationUrlSchema, linkSlugSchema, linkTitleSchema } from '#validators/link'
 import {
   createLink,
@@ -58,7 +58,7 @@ export default class LinksController {
         title: linkTitleSchema(),
         description: vine.string().trim().optional(),
         teamId: vine.number().optional(),
-        tags: vine.array(tagNameSchema()).distinct().optional(),
+        tags: tagListSchema().optional(),
       })
     )
 
@@ -110,7 +110,7 @@ export default class LinksController {
         destinationUrl: destinationUrlSchema().optional(),
         title: linkTitleSchema().optional(),
         description: vine.string().trim().optional(),
-        tags: vine.array(tagNameSchema()).distinct().optional(),
+        tags: tagListSchema().optional(),
       })
     )
 

@@ -47,14 +47,22 @@ export async function findSlugConflict(slug: string, teamId: number | null, excl
 
 /**
  * Resolves tag names to ids, creating missing tags (stored lowercase).
+ *
+ * CWE-770: looks up every tag in one query instead of one query per
+ * tag, and only inserts the ones that are missing. The validator caps
+ * the list at MAX_TAGS_PER_LINK, so the work per request stays bounded.
  */
 export async function resolveTagIds(tagNames: string[]) {
-  const tagIds: number[] = []
-  for (const tagName of tagNames) {
-    const tag = await Tag.firstOrCreate({ name: tagName.toLowerCase() })
-    tagIds.push(tag.id)
+  const names = [...new Set(tagNames.map((name) => name.toLowerCase()))]
+  if (names.length === 0) {
+    return []
   }
-  return tagIds
+
+  const tags = await Tag.fetchOrCreateMany(
+    'name',
+    names.map((name) => ({ name }))
+  )
+  return tags.map((tag) => tag.id)
 }
 
 /**

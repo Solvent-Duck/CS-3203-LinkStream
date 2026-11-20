@@ -4,6 +4,8 @@ import { DateTime } from 'luxon'
 import Link from '#models/link'
 import Team from '#models/team'
 import User from '#models/user'
+import { resetThrottle } from '#middleware/throttle_middleware'
+import { MAX_TAGS_PER_LINK } from '#validators/tag'
 
 const TABLES = [
   'link_tags',
@@ -28,6 +30,7 @@ type ValidationErrorBody = {
  */
 function isolateDatabase(group: { each: { setup: (hook: () => Promise<void>) => void } }) {
   group.each.setup(async () => {
+    resetThrottle()
     for (const table of TABLES) {
       await db.from(table).delete()
     }
@@ -531,5 +534,58 @@ test.group('Link deployment / resolving short links', (group) => {
 
     const link = await Link.findByOrFail('slug', 'API-Docs')
     assert.equal(Number(link.clickCount), 1)
+  })
+})
+
+test.group('Link deployment / resource limits (CWE-770)', (group) => {
+  isolateDatabase(group)
+
+  test('rejects a link with more tags than allowed', async ({ client, assert }) => {
+    const user = await createOwner()
+
+    const response = await client
+      .post('/api/v1/links')
+      .json({
+        slug: 'too-many-tags',
+        destinationUrl: DESTINATION,
+        title: 'Too many tags',
+        tags: Array.from({ length: MAX_TAGS_PER_LINK + 1 }, (_, i) => `tag${i}`),
+      })
+      .loginAs(user)
+
+    response.assertStatus(422)
+    assert.include(validationFields(response.body()), 'tags')
+    const tagCount = await db.from('tags').count('* as total')
+    assert.equal(Number(tagCount[0].total), 0)
+  })
+
+  test('reuses existing tags instead of duplicating them', async ({ client, assert }) => {
+    const user = await createOwner()
+
+    for (const slug of ['first', 'second']) {
+      const response = await client
+        .post('/api/v1/links')
+        .json({ slug, destinationUrl: DESTINATION, title: slug, tags: ['devops', 'api'] })
+        .loginAs(user)
+      response.assertCreated()
+    }
+
+    const tagCount = await db.from('tags').count('* as total')
+    assert.equal(Number(tagCount[0].total), 2)
+  })
+
+  test('returns 429 after too many writes from one user', async ({ client, assert }) => {
+    const user = await createOwner()
+    let last
+
+    for (let i = 0; i < 21; i++) {
+      last = await client
+        .post('/api/v1/links')
+        .json({ slug: `burst-${i}`, destinationUrl: DESTINATION, title: 'Burst' })
+        .loginAs(user)
+    }
+
+    last!.assertStatus(429)
+    assert.exists(last!.header('retry-after'))
   })
 })

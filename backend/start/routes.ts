@@ -38,16 +38,25 @@ router
       .as('profile')
       .use(middleware.auth())
 
-    router.get('/links', [LinksController, 'index']) // Full-text list & typeahead search
-    router.get('/links/:id', [LinksController, 'show']) // Fetch single link metadata
+    // CWE-770: reads (search, tag filter) are throttled per client
+    router
+      .group(() => {
+        router.get('/links', [LinksController, 'index']) // Full-text list & typeahead search
+        router.get('/links/:id', [LinksController, 'show']) // Fetch single link metadata
+      })
+      .use(middleware.throttle({ name: 'links-read', max: 60, windowMs: 60_000 }))
 
+    // CWE-770: writes (which can create tags) get a tighter per-user limit
     router
       .group(() => {
         router.post('/links', [LinksController, 'store']) // Create new shortcut
         router.patch('/links/:id', [LinksController, 'update']) // Edit a shortcut
         router.delete('/links/:id', [LinksController, 'destroy']) // Soft/hard delete
       })
-      .use(middleware.auth())
+      .use([
+        middleware.auth(),
+        middleware.throttle({ name: 'links-write', max: 20, windowMs: 60_000 }),
+      ])
   })
   .prefix('/api/v1')
 
