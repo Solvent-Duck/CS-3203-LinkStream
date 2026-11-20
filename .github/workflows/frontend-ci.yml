@@ -38,7 +38,7 @@ jobs:
         run: python -m unittest discover -s unit-tests -p "test_resource_search.py"
       - name: Run unit tests
         run: npm test
-      - name: Lint frontend
+      - name: Security lint frontend (blocks unsafe HTML)
         run: npm run lint -- --max-warnings=0
       - name: Type-check frontend
         run: npx next typegen && npm run typecheck

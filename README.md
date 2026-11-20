@@ -101,6 +101,14 @@ From the `frontend` directory, run the ResourceSearch unit test with:
 python -m unittest discover -s unit-tests -p "test_resource_search.py"
 ```
 
+### Resource Search XSS protection
+
+Resource Search treats search terms and returned resource text as untrusted input.
+The frontend removes control characters, displays the remaining values as React text
+(rather than raw HTML), and has an automated test for script-shaped resource titles.
+ESLint rejects `dangerouslySetInnerHTML`; the frontend CI job must pass this security
+lint before the production deployment job can run.
+
 The test covers available shortcuts, an empty list, a one-shortcut boundary case,
 invalid input, and valid and invalid administrator permissions.
 

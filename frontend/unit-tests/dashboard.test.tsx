@@ -107,4 +107,15 @@ describe("LinkDashboard", () => {
     }));
     await waitFor(() => expect(screen.queryByText("Product roadmap")).toBeNull());
   });
+
+  it("renders script-shaped link content as safe text instead of HTML", async () => {
+    const hostileTitle = '<img src=x onerror="window.__xss = true">';
+    api.getLinks.mockResolvedValue([{ ...createdLink, title: hostileTitle }]);
+
+    render(<LinkDashboard />);
+
+    await screen.findByText(hostileTitle);
+    expect(document.querySelector("img")).toBeNull();
+    expect((window as typeof window & { __xss?: boolean }).__xss).toBeUndefined();
+  });
 });
