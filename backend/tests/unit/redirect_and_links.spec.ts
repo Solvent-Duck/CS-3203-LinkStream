@@ -6,6 +6,7 @@ import Team from '#models/team'
 import User from '#models/user'
 import {
   destinationUrlSchema,
+  HTTP_URL_PATTERN,
   linkSlugSchema,
   linkTitleSchema,
   MAX_TITLE_LENGTH,
@@ -80,6 +81,15 @@ test.group('Sprint 1 / slug validation', () => {
 })
 
 test.group('Sprint 1 / destination URL and title validation', () => {
+  test('accepts only HTTP and HTTPS destination URLs', async ({ assert }) => {
+    assert.equal(await validateUrl('http://example.com/docs'), 'http://example.com/docs')
+    assert.equal(
+      await validateUrl('https://canvas.ou.edu/courses/12345'),
+      'https://canvas.ou.edu/courses/12345'
+    )
+    assert.isTrue(HTTP_URL_PATTERN.test('https://example.com'))
+  })
+
   test('trims whitespace around the destination URL', async ({ assert }) => {
     assert.equal(
       await validateUrl('   https://canvas.ou.edu/courses/12345   '),
@@ -87,8 +97,15 @@ test.group('Sprint 1 / destination URL and title validation', () => {
     )
   })
 
-  test('rejects script, file, and malformed destinations')
-    .with(['javascript:alert(1)', 'file:///etc/passwd', 'not a url', ''])
+  test('rejects executable, non-web, and malformed destinations')
+    .with([
+      'javascript:alert(1)',
+      'data:text/html,<script>alert(1)</script>',
+      'file:///etc/passwd',
+      'ftp://example.com/archive',
+      'not a url',
+      '',
+    ])
     .run(async ({ assert }, url) => {
       await assert.rejects(() => validateUrl(url))
     })
