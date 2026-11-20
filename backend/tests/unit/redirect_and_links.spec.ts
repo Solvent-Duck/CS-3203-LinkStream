@@ -12,7 +12,8 @@ import {
   MAX_TITLE_LENGTH,
 } from '#validators/link'
 import { createLink, SlugConflictError } from '#services/link_service'
-import { resolveRedirect } from '#services/redirect_service'
+import { resolveRedirect, isValidSlug } from '#services/redirect_service'
+import RedirectsController from '#controllers/redirects_controller'
 
 // Sprint 1 core logic: slug validation, destination URL validation,
 // link creation/storage, and redirect resolution with click counting.
@@ -269,5 +270,165 @@ test.group('Sprint 1 / redirect resolution and click counting', (group) => {
     await deleted.refresh()
     assert.equal(inactive.clickCount, 0)
     assert.equal(deleted.clickCount, 0)
+  })
+
+  test('validates slug format and rejects SQL injection strings', ({ assert }) => {
+    assert.isTrue(isValidSlug('docs'))
+    assert.isTrue(isValidSlug('sprint/tasks'))
+    assert.isTrue(isValidSlug('Release_Notes-2026'))
+    assert.isTrue(isValidSlug('  trimmed-slug  '))
+    assert.isFalse(isValidSlug("' OR '1'='1"))
+    assert.isFalse(isValidSlug("admin' --"))
+    assert.isFalse(isValidSlug("'; DROP TABLE links; --"))
+    assert.isFalse(isValidSlug(''))
+    assert.isFalse(isValidSlug('   '))
+    assert.isFalse(isValidSlug(null))
+    assert.isFalse(isValidSlug(undefined))
+    assert.isFalse(isValidSlug(123))
+    assert.isFalse(isValidSlug('a'.repeat(65)))
+  })
+
+  test('resolves valid redirect and safely returns null for SQL injection payloads (CWE-89)', async ({
+    assert,
+  }) => {
+    const owner = await createOwner()
+    const team = await createTeam('sprint')
+    await createLink({
+      slug: 'valid-target',
+      destinationUrl: DESTINATION,
+      title: 'Valid target',
+      userId: owner.id,
+    })
+    await createLink({
+      slug: 'team-target',
+      destinationUrl: DESTINATION,
+      title: 'Team target',
+      teamId: team.id,
+      userId: owner.id,
+    })
+
+    // Confirm valid redirect resolves correctly
+    const validGlobal = await resolveRedirect('valid-target')
+    assert.isNotNull(validGlobal)
+    assert.equal(validGlobal?.destinationUrl, DESTINATION)
+    assert.equal(validGlobal?.clickCount, 1)
+
+    const validScoped = await resolveRedirect('team-target', 'sprint')
+    assert.isNotNull(validScoped)
+    assert.equal(validScoped?.destinationUrl, DESTINATION)
+    assert.equal(validScoped?.clickCount, 1)
+
+    // SQL injection payloads must return null and never execute as raw SQL or bypass tenant scoping
+    const payloads = [
+      "' OR '1'='1",
+      "' OR 1=1 --",
+      "admin' --",
+      "valid-target' OR '1'='1",
+      "'; DROP TABLE links; --",
+      "' UNION SELECT * FROM links --",
+      "1' OR '1' = '1",
+    ]
+
+    for (const payload of payloads) {
+      assert.isNull(await resolveRedirect(payload))
+      assert.isNull(await resolveRedirect(payload, 'sprint'))
+      assert.isNull(await resolveRedirect('team-target', payload))
+      assert.isNull(await resolveRedirect(payload, payload))
+    }
+  })
+
+  test('RedirectsController safely redirects valid shortcut and falls back on SQL injection payload', async ({
+    assert,
+  }) => {
+    const owner = await createOwner()
+    const team = await createTeam('sprint')
+    await createLink({
+      slug: 'valid-shortcut',
+      destinationUrl: DESTINATION,
+      title: 'Valid shortcut',
+      userId: owner.id,
+    })
+    await createLink({
+      slug: 'team-shortcut',
+      destinationUrl: DESTINATION,
+      title: 'Team shortcut',
+      teamId: team.id,
+      userId: owner.id,
+    })
+
+    const controller = new RedirectsController()
+
+    // 1. Valid global redirect
+    let globalRedirectUrl = ''
+    await controller.resolveGlobal({
+      params: { linkSlug: 'valid-shortcut' },
+      response: {
+        redirect: (url: string) => {
+          globalRedirectUrl = url
+          return url
+        },
+      },
+    } as any)
+    assert.equal(globalRedirectUrl, DESTINATION)
+
+    // 2. Valid scoped redirect
+    let scopedRedirectUrl = ''
+    await controller.resolveScoped({
+      params: { teamSlug: 'sprint', linkSlug: 'team-shortcut' },
+      response: {
+        redirect: (url: string) => {
+          scopedRedirectUrl = url
+          return url
+        },
+      },
+    } as any)
+    assert.equal(scopedRedirectUrl, DESTINATION)
+
+    // 3. SQL injection payload in global redirect falls back to portal search
+    let injectionGlobalRedirectUrl = ''
+    await controller.resolveGlobal({
+      params: { linkSlug: "' OR '1'='1" },
+      response: {
+        redirect: (url: string) => {
+          injectionGlobalRedirectUrl = url
+          return url
+        },
+      },
+    } as any)
+    assert.equal(
+      injectionGlobalRedirectUrl,
+      'http://localhost:3000/?search=' + encodeURIComponent("' OR '1'='1") + '&notFound=true'
+    )
+
+    // 4. SQL injection payload in scoped redirect falls back to portal search
+    let injectionScopedRedirectUrl = ''
+    await controller.resolveScoped({
+      params: { teamSlug: 'sprint', linkSlug: "' OR '1'='1" },
+      response: {
+        redirect: (url: string) => {
+          injectionScopedRedirectUrl = url
+          return url
+        },
+      },
+    } as any)
+    assert.equal(
+      injectionScopedRedirectUrl,
+      'http://localhost:3000/?search=' + encodeURIComponent("' OR '1'='1") + '&notFound=true'
+    )
+
+    let teamInjectionRedirectUrl = ''
+    await controller.resolveScoped({
+      params: { teamSlug: "' OR '1'='1", linkSlug: 'team-shortcut' },
+      response: {
+        redirect: (url: string) => {
+          teamInjectionRedirectUrl = url
+          return url
+        },
+      },
+    } as any)
+    assert.equal(
+      teamInjectionRedirectUrl,
+      'http://localhost:3000/?search=' + encodeURIComponent('team-shortcut') + '&notFound=true'
+    )
   })
 })

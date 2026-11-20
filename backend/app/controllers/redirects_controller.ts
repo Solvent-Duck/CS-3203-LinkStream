@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { resolveRedirect } from '#services/redirect_service'
+import { resolveRedirect, isValidSlug } from '#services/redirect_service'
 
 function portalFallback(linkSlug: string) {
   return `http://localhost:3000/?search=${encodeURIComponent(linkSlug)}&notFound=true`
@@ -12,6 +12,10 @@ export default class RedirectsController {
    */
   async resolveGlobal({ params, response }: HttpContext) {
     const { linkSlug } = params
+
+    if (!isValidSlug(linkSlug)) {
+      return response.redirect(portalFallback(typeof linkSlug === 'string' ? linkSlug : ''))
+    }
 
     const link = await resolveRedirect(linkSlug)
     if (!link) {
@@ -28,6 +32,10 @@ export default class RedirectsController {
    */
   async resolveScoped({ params, response }: HttpContext) {
     const { teamSlug, linkSlug } = params
+
+    if (!isValidSlug(teamSlug) || !isValidSlug(linkSlug)) {
+      return response.redirect(portalFallback(typeof linkSlug === 'string' ? linkSlug : ''))
+    }
 
     const link = await resolveRedirect(linkSlug, teamSlug)
     if (!link) {
