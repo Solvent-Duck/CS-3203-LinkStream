@@ -13,6 +13,7 @@ import {
   ApiError,
   API_BASE,
 } from "@/app/lib/api";
+import { cleanUserText } from "@/app/lib/safe-text";
 
 export default function LinkDashboard() {
   const { user, loading: authLoading, logout } = useAuth();
@@ -457,7 +458,7 @@ export default function LinkDashboard() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch(cleanUserText(e.target.value))}
             aria-label="Resource Search"
             placeholder="Search resources, labels, or URLs..."
           />
@@ -490,12 +491,12 @@ export default function LinkDashboard() {
                           className="link-title-link"
                           title="Open via LinkStream redirect"
                         >
-                          <strong>{link.title}</strong>
+                          <strong>{cleanUserText(link.title)}</strong>
                         </a>
                       </div>
 
                       <div className="link-card-slug-row">
-                        <span className="link-card-slug">go/{link.slug}</span>
+                        <span className="link-card-slug">go/{cleanUserText(link.slug)}</span>
                         <button
                           type="button"
                           className={`link-copy-btn ${isCopied ? "copied" : ""}`}
@@ -522,11 +523,11 @@ export default function LinkDashboard() {
                         className="link-card-url"
                         title={link.destinationUrl}
                       >
-                        {link.destinationUrl}
+                        {cleanUserText(link.destinationUrl)}
                       </a>
 
                       {link.description && (
-                        <p className="link-card-desc">{link.description}</p>
+                        <p className="link-card-desc">{cleanUserText(link.description)}</p>
                       )}
                     </div>
                     <div className="link-card-meta">
@@ -541,7 +542,7 @@ export default function LinkDashboard() {
                         <div className="link-card-tags">
                           {link.tags.map((tag) => (
                             <span key={tag.id} className="link-tag">
-                              {tag.name}
+                              {cleanUserText(tag.name)}
                             </span>
                           ))}
                         </div>
